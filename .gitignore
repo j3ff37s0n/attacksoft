@@ -216,3 +216,11 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+# Nginx Proxy Manager local data and certs
+data/
+letsencrypt/
+
+# OS files
+.DS_Store
+Thumbs.db
+
