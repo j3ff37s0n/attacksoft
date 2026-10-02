@@ -22,3 +22,8 @@ All extrapolation in sandboxes is wiped as soon as all processes are complete or
 No interaction between user and local hosted AI agent. 
 Agent is sandboxed without internet access.
 Processes information and sends to central process management. 
+
+# Logging
+Wazuh for file integrity and detections
+Grafana for reporting
+Prometheus for infrastructure status 
