@@ -1,10 +1,10 @@
 """Render every prompt template against the fixture set and verify:
     - all placeholders present in the template are known,
     - all expected placeholders are present,
-    - rendered text is valid UTF-8,
-    - conservative token estimate fits under the model context budget.
+    - rendered text is valid utf8,
+    - small token est under the model context budget. (very small models, under 1b and 2.5b for collab)
 
-Also offers a `smoke` mode that calls Ollama once with the exec prompt and
+Warm calls for Ollama once with the exec prompt 
 confirms the returned content parses as JSON with the required top-level keys.
 
 Run:
