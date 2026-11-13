@@ -24,6 +24,6 @@ Agent is sandboxed without internet access.
 Processes information and sends to central process management. 
 
 # Logging
-Wazuh for file integrity and detections
-Grafana for reporting
-Prometheus for infrastructure status 
+Standard linux systemd journald 
+logging per worker, per entry, per cuckoo submissions
+Porxmox default logging for VM activity
