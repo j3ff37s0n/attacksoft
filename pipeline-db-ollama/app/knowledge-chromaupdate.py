@@ -1,7 +1,7 @@
-"""Knowledge base retrieval: ChromaDB + Ollama embeddings + hybrid scoring.
+"""Knowledge base retrieval: sqllite + Ollama embeddings + hybrid scoring.
 
 The collection is populated by app.ingest / app.sync_knowledge. This module
-only reads. No seed corpus.
+only reads only.
 """
 from __future__ import annotations
 
