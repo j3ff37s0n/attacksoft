@@ -1,15 +1,17 @@
 """Production knowledge ingestion.
 
 Sources:
-  - MITRE ATT&CK enterprise STIX 2.1 bundle (versioned, from attack-stix-data)
+  - MITRE ATT&CK enterprise 
   - NVD CVE 2.0 yearly gzip feeds and the modified feed
   - CISA KEV JSON
   - Maintained baseline YAML
 
 Embedding strategy: each document is embedded from its first 800 characters
-(the lead summary), while the full text is stored in Chroma. Retrieval
+(the lead summary), while the full text is stored in sql. Retrieval
 relevance comes from the lead; full text stays available for LLM citation.
 This cuts embedding workload by roughly 3x versus embedding the full document.
+
+If you see "chroma" assume it's sqllite. For ease after running into issues alias was made to prvent rewrites. :)
 """
 from __future__ import annotations
 
