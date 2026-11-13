@@ -1,7 +1,9 @@
-"""Evidence extractor: parse a Cuckoo3 analysis directory into a normalized
+"""Evidence extractor: parse a Cuckoo analysis directory into a normalized
 evidence bundle that conforms to evidence_bundle.schema.json.
 
-Design notes:
+Unique as the cuckoo config completely bypasses standard agent and agent analysis, it utalizes sysmon and auditd (normalized to sysmon for ease).
+
+guidelines (minor changes in practice for efficiency):
 - Facts are extracted at field granularity (one fact per notable value), not
   one per event. This keeps each fact's verbatim short enough to survive the
   prompt truncation (400 chars) and keeps citations unambiguous.
