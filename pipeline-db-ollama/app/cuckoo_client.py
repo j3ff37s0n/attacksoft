@@ -18,7 +18,7 @@ from pathlib import Path
 
 log = logging.getLogger(__name__)
 
-SSH_HOST = "capeadmin@192.168.0.102"
+SSH_HOST = "capeadmin@<internal_ip>"
 SSH_KEY = "/opt/pipeline/.ssh/cuckoo_key"
 SSH_OPTS = [
     "-i", SSH_KEY,
