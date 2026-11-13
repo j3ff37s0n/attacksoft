@@ -1,14 +1,14 @@
-"""Deterministic verifier for LLM-produced reports.
+"""verifier for LLM-produced reports.
 
-Enforces what the prompt only requests:
-  - verbatim citation substring match against source fact verbatim / chunk text
-  - claim removal when all citations fail
-  - claim-ID reference resolution (dangling references are dropped)
-  - orphan claim removal (claims referenced by no structural field are removed)
-  - remediation evidence+knowledge citation rule per recommendation
-  - timeline_events cap at 40
-  - server-controlled field injection
-  - final schema validation
+Enforce:
+- verbatim citation substring match against source fact verbatim / chunk text
+- claim removal when all citations fail
+- claim-ID reference resolution (unneeded references are dropped)
+- orphan claim removal (unneded claims referenced are removed)
+- remediation evidence+knowledge citation rule per recommendation
+- timeline_events cap at 40 (this reduces prompt size)
+- server-controlled field injection
+- final schema validation
 
 Usage:
     from app.verifier import verify_report
