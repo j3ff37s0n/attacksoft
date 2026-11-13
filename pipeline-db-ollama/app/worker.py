@@ -1,10 +1,9 @@
 """Worker pool: the pipeline itself.
 
-Runs as one of N parallel systemd services (WORKER_ID env). Each worker
-atomically claims one submission per loop iteration via db.claim_one().
-A claim has a TTL; if the worker dies mid-phase, another worker picks it up
-after CLAIM_TTL_SECONDS. Stuck tail states (generating_reports / verifying /
-rendering) are reclaimed by _reclaim_zombies after ZOMBIE_TIMEOUT_S.
+Runs as one of as parallel systemd services (WORKER_ID env). 
+Each worker atomically claims one submission per loop iteration via db.claim_one(). (there is some trade off during pollin)
+If the worker dies mid-phase, another worker picks it up.
+After CLAIM_TTL_SECONDS. Stuck tail states are reclaimed by _reclaim_zombies after ZOMBIE_TIMEOUT_S.
 
 Model output is normalized deterministically before verification:
 - source_type corrected from source_id prefix (f_* -> evidence, else knowledge)
@@ -14,10 +13,7 @@ Model output is normalized deterministically before verification:
 
 JSON parsing tolerates unescaped control characters via strict=False.
 
-A generation that survives verification but contains an empty timeline is
-either a genuine quality failure (evidence had candidates the model failed to
-ground) or a legitimate "nothing to report" case (evidence had zero
-candidates). The former fails the submission; the latter adds an abstention.
+Missing timeline issues result in guarantee fialures, timeline acts as extra sanatizer
 """
 from __future__ import annotations
 
