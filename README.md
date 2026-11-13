@@ -1,4 +1,4 @@
-# attacksoft
+# Attacksoft.com
 
 Allows users to submit anything and get an analysis level extrapolation based on all processes captured from running it on a sandbox.
 
@@ -55,7 +55,7 @@ The SSH key on the pipeline is only authorized for the specific sandbox user on 
 ## What this doesn't protect against
 
 - This is for reports, not a threat modeling scanner. The signature set is customized but not comprehensive.
-- Hardened again sandbox escape. The isolation is VM-level and hardware level via firewalls.
+- Hardened again sandbox escape. The isolation is VM-level and hardware level via firewalls. Wouldn't produce full logs if escaped.
 
 
 
