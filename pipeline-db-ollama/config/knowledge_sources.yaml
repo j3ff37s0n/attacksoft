@@ -1,3 +1,5 @@
+#sources the llms use to provide evidence for their claims. Also what is pulled for dsahboards for snapshots.
+
 mitre:
   index_url: "https://raw.githubusercontent.com/mitre-attack/attack-stix-data/master/index.json"
   fallback_bundle_url: "https://raw.githubusercontent.com/mitre-attack/attack-stix-data/master/enterprise-attack/enterprise-attack.json"
