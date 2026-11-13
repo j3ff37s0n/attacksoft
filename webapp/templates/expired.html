@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Analysis Expired — Attacksoft{% endblock %}
+
+{% block content %}
+<p class="eyebrow">STEP 02 — Target Analysis</p>
+
+<div class="panel" style="display: flex; flex-direction: column; text-align: center;">
+  <h1 style="margin-bottom:16px;">Analysis Expired</h1>
+  
+  <p style="color:var(--ink-muted);margin-bottom:24px;font-size:1.05rem;">
+    This submission has been purged from our systems.
+  </p>
+  
+  <p style="color:var(--ink-muted);margin-bottom:32px;font-size:0.95rem;">
+    Free analyses are retained for 90 minutes after completion. The data for this specific file is no longer available.
+  </p>
+
+  <div>
+    <a class="btn" href="{{ url_for('index') }}">Submit a new file</a>
+  </div>
+</div>
+{% endblock %}

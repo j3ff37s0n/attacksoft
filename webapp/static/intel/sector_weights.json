@@ -1,0 +1,58 @@
+{
+  "finance": {
+    "label": "Financial Services",
+    "cwes": ["CWE-89","CWE-79","CWE-287","CWE-502","CWE-918","CWE-352","CWE-307","CWE-200"],
+    "techniques": ["T1078","T1566","T1071","T1486","T1110","T1190","T1555","T1059","T1133","T1567","T1552","T1021","T1055","T1018","T1598","T1185","T1489","T1550","T1071.001","T1539"],
+    "vendors": ["oracle","sap","microsoft","citrix","f5","fortinet","adobe"],
+    "why": "External payment/account infrastructure. Heavy credential, session and web-injection exposure. High fraud economics."
+  },
+  "healthcare": {
+    "label": "Healthcare",
+    "cwes": ["CWE-79","CWE-89","CWE-798","CWE-311","CWE-287","CWE-22","CWE-434","CWE-306"],
+    "techniques": ["T1486","T1566","T1078","T1213","T1021","T1059","T1555","T1110","T1190","T1133","T1071","T1550","T1055","T1598","T1036","T1222","T1567","T1489","T1003","T1087"],
+    "vendors": ["microsoft","epic","cerner","oracle","ivanti","progress","citrix"],
+    "why": "High-value PHI, legacy EMR estates, ransomware economics. Regulatory pressure after breach."
+  },
+  "energy": {
+    "label": "Energy",
+    "cwes": ["CWE-94","CWE-306","CWE-119","CWE-22","CWE-787","CWE-502","CWE-798","CWE-89"],
+    "techniques": ["T1190","T1059","T1489","T1078","T1566","T1195","T1071","T1055","T1018","T1021","T1053","T1003","T1552","T1133","T1606","T1486","T1562","T1547","T1574","T1014"],
+    "vendors": ["siemens","schneider","honeywell","rockwell","microsoft","yokogawa","ge"],
+    "why": "IT/OT convergence. IT edge exposure reaches OT. Availability impact is operational."
+  },
+  "government": {
+    "label": "Government / Public Sector",
+    "cwes": ["CWE-22","CWE-287","CWE-89","CWE-79","CWE-434","CWE-502","CWE-306","CWE-200"],
+    "techniques": ["T1566","T1078","T1195","T1190","T1071","T1059","T1133","T1021","T1003","T1552","T1489","T1486","T1055","T1071.001","T1550","T1110","T1598","T1590","T1583","T1587"],
+    "vendors": ["microsoft","citrix","ivanti","fortinet","f5","vmware","cisco"],
+    "why": "Edge appliances and supply chain are highest-volume initial access against public-sector targets."
+  },
+  "technology": {
+    "label": "Technology / SaaS",
+    "cwes": ["CWE-94","CWE-502","CWE-22","CWE-918","CWE-89","CWE-79","CWE-434","CWE-352"],
+    "techniques": ["T1195","T1190","T1078","T1059","T1071","T1053","T1552","T1555","T1021","T1567","T1539","T1133","T1003","T1018","T1110","T1486","T1562","T1070","T1547","T1036"],
+    "vendors": ["atlassian","gitlab","jenkins","vmware","microsoft","hashicorp","salesforce","okta"],
+    "why": "CI/CD and SaaS concentration. Open-source transitive dependency exposure."
+  },
+  "manufacturing": {
+    "label": "Manufacturing",
+    "cwes": ["CWE-22","CWE-94","CWE-119","CWE-787","CWE-306","CWE-502","CWE-798","CWE-89"],
+    "techniques": ["T1190","T1059","T1486","T1078","T1021","T1055","T1489","T1003","T1552","T1133","T1562","T1547","T1071","T1018","T1566","T1485","T1489","T1574","T1014","T1003"],
+    "vendors": ["microsoft","siemens","rockwell","honeywell","ivanti","schneider"],
+    "why": "Legacy Windows estates plus IT/OT edges. Ransomware crews target production continuity."
+  },
+  "retail": {
+    "label": "Retail / eCommerce",
+    "cwes": ["CWE-89","CWE-79","CWE-502","CWE-287","CWE-918","CWE-352","CWE-307","CWE-434"],
+    "techniques": ["T1190","T1566","T1078","T1110","T1071","T1059","T1555","T1539","T1133","T1552","T1567","T1055","T1486","T1489","T1111","T1598","T1003","T1018","T1021","T1606"],
+    "vendors": ["magento","adobe","microsoft","salesforce","shopify","oracle","bigcommerce"],
+    "why": "Card-data infrastructure, seasonal credential-stuffing pressure, POS pivot surface."
+  },
+  "ot_ics": {
+    "label": "OT / ICS / SCADA",
+    "cwes": ["CWE-306","CWE-119","CWE-787","CWE-22","CWE-798","CWE-94","CWE-502","CWE-434"],
+    "techniques": ["T0855","T0836","T0886","T0816","T0800","T0859","T0858","T0879","T0866","T0869","T0855","T0803","T0809","T0839","T0840","T0842","T0845","T0846","T0871","T0881"],
+    "vendors": ["siemens","schneider","rockwell","honeywell","yokogawa","ge","moxa","phoenix"],
+    "why": "Direct device control. Availability impact is physical. ICS-specific CVEs dominate."
+  }
+}
