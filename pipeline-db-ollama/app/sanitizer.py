@@ -1,8 +1,9 @@
 """Deterministic sanitizer for the evidence bundle and the LLM report.
 
-Runs BEFORE the LLM (sanitize the bundle so the model never sees operator
-infrastructure) and AGAIN AFTER the LLM (sanitize model output as belt-and-
-suspenders). Returns per-pass counts only; no redacted values are ever logged.
+Runs before the LLM ingestion.
+cleans the cuckoo results so the model never sees local infrastructure
+One move after the LLM runs 
+Returns per-pass counts only; no redacted values are ever logged.
 
 Test: python -m app.test_sanitizer
 """
