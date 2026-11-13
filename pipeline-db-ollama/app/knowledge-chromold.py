@@ -1,4 +1,6 @@
-"""Knowledge base retrieval: ChromaDB + Ollama embeddings + hybrid scoring."""
+"""Knowledge base retrieval: sqllite + Ollama embeddings + hybrid scoring.
+If you see chroma, it's just the alias for sqllite. Chroma changed due to version issues.
+"""
 
 from __future__ import annotations
 
