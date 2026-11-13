@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block content %}
+  {% set risk_explanations = {
+    "none": "The analysis found no evidence of malicious activity in the submitted sample.",
+    "low": "The sample exhibits minor suspicious characteristics but no confirmed malicious behavior in the sandbox.",
+    "medium": "The sample demonstrates behaviors consistent with malicious intent that would cause limited harm if executed on a real endpoint.",
+    "high": "The sample demonstrates behaviors consistent with malicious intent that would cause material harm if executed on a real endpoint.",
+    "critical": "The sample demonstrates active compromise behaviors that would cause severe harm if executed on a real endpoint and require immediate action.",
+    "unknown": "The evidence was insufficient to assign a definitive risk rating. See assessment limitations below."
+  } %}
+
+  <h2>Executive Summary</h2>
+  <div class="metadata-box" style="background: #f4f4f4; padding: 12px; border-radius: 5px; margin-bottom: 20px; page-break-inside: avoid;">
+    <h3 style="margin-top: 0; font-size: 1.05em; color: #222;">File Identity</h3>
+    <table style="width: 100%; border-collapse: collapse; font-size: 0.82em;">
+      <tr><td style="padding: 3px; width: 150px; color: #555;"><b>Original Filename:</b></td><td style="padding: 3px;">{{ file_meta.orig_filename }}</td></tr>
+      <tr><td style="padding: 3px; color: #555;"><b>File Type:</b></td><td style="padding: 3px;">{{ file_meta.filetype }}</td></tr>
+      <tr><td style="padding: 3px; color: #555;"><b>Size:</b></td><td style="padding: 3px;">{{ file_meta.size_bytes }} bytes</td></tr>
+      <tr><td style="padding: 3px; color: #555;"><b>MD5:</b></td><td style="padding: 3px; font-family: monospace; word-break: break-all;">{{ file_meta.md5 }}</td></tr>
+      <tr><td style="padding: 3px; color: #555;"><b>SHA1:</b></td><td style="padding: 3px; font-family: monospace; word-break: break-all;">{{ file_meta.sha1 }}</td></tr>
+      <tr><td style="padding: 3px; color: #555;"><b>SHA256:</b></td><td style="padding: 3px; font-family: monospace; word-break: break-all;">{{ file_meta.sha256 }}</td></tr>
+      <tr><td style="padding: 3px; color: #555;"><b>SHA512:</b></td><td style="padding: 3px; font-family: monospace; font-size: 0.72em; word-break: break-all;">{{ file_meta.sha512 }}</td></tr>
+      {% if file_meta.imphash %}<tr><td style="padding: 3px; color: #555;"><b>Imphash:</b></td><td style="padding: 3px; font-family: monospace;">{{ file_meta.imphash }}</td></tr>{% endif %}
+      {% if file_meta.pe_timestamp %}<tr><td style="padding: 3px; color: #555;"><b>PE Compile Time:</b></td><td style="padding: 3px;">{{ file_meta.pe_timestamp }} UTC</td></tr>{% endif %}
+      <tr><td style="padding: 3px; color: #555;"><b>Digital Signature:</b></td><td style="padding: 3px;">{{ file_meta.signature_status }}</td></tr>
+      {% for key in ['CompanyName', 'FileDescription', 'FileVersion', 'OriginalFilename', 'ProductName'] %}
+        {% if file_meta.version.get(key) %}
+        <tr><td style="padding: 3px; color: #555;"><b>{{ key }}:</b></td><td style="padding: 3px;">{{ file_meta.version[key] }}</td></tr>
+        {% endif %}
+      {% endfor %}
+      {% if file_meta.imports_count %}<tr><td style="padding: 3px; color: #555;"><b>Imported Functions:</b></td><td style="padding: 3px;">{{ file_meta.imports_count }}</td></tr>{% endif %}
+      {% if file_meta.resources_count %}<tr><td style="padding: 3px; color: #555;"><b>PE Resources:</b></td><td style="padding: 3px;">{{ file_meta.resources_count }}</td></tr>{% endif %}
+      {% if file_meta.sections %}<tr><td style="padding: 3px; color: #555; vertical-align: top;"><b>PE Sections:</b></td><td style="padding: 3px; font-family: monospace; font-size: 0.82em;">{{ file_meta.sections|join(' · ') }}</td></tr>{% endif %}
+    </table>
+  </div>
+  <div class="summary-box">
+    {% if summary_claim %}
+      <p>{{ summary_claim.text }}</p>
+    {% else %}
+      <p class="empty">No summary was produced.</p>
+    {% endif %}
+  </div>
+
+  <h2>Risk Rating</h2>
+  <div class="risk-banner risk-{{ report.risk_level }}">
+    <div>
+      <div class="label">Assessment</div>
+      <div class="value">{{ report.risk_level|upper }}</div>
+    </div>
+    <div class="explanation">{{ risk_explanations[report.risk_level] }}</div>
+  </div>
+
+  <h2>Key Findings</h2>
+  {% if key_findings %}
+  <ol class="findings">
+    {% for claim in key_findings %}
+      <li>{{ claim.text }}</li>
+    {% endfor %}
+  </ol>
+  {% else %}
+  <p class="empty">No key findings were produced.</p>
+  {% endif %}
+
+  {% if abstentions %}
+  <h2>Assessment Limitations</h2>
+  <p>The following items could not be determined from the available evidence. They are recorded here so that decision makers understand the boundaries of this assessment.</p>
+  {% for a in abstentions %}
+  <div class="limitation">
+    <div class="limitation-title">{{ a.section|replace("_", " ")|title }}</div>
+    <p><strong>Reason:</strong> {{ a.reason }}</p>
+    <p><strong>Missing evidence:</strong> {{ a.evidence_gap }}</p>
+  </div>
+  {% endfor %}
+  {% endif %}
+
+  {% if report.insufficient_evidence %}
+  <p class="empty">Overall evidence was insufficient for full coverage; this assessment should be read together with the limitations above.</p>
+  {% endif %}
+
+  <div class="appendix">
+    <h2>Technical Detail</h2>
+
+    <h3>MITRE ATT&amp;CK Techniques</h3>
+    {% if techniques %}
+    <table>
+      <tr><th>Technique</th><th>Name</th><th>Evidenced by</th></tr>
+      {% for t in techniques %}
+      <tr>
+        <td class="mono">{{ t.technique_id }}</td>
+        <td>{{ t.name }}</td>
+        <td class="mono">{{ t.evidence_claim_ids|join(", ") }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% else %}
+    <p class="empty">No ATT&amp;CK techniques were mapped to the observed evidence.</p>
+    {% endif %}
+
+    <h3>Supporting Evidence by Finding</h3>
+    {% if key_findings or summary_claim %}
+    <table>
+      <tr><th>Claim</th><th>Statement</th><th>Source</th><th>Verbatim</th></tr>
+      {% for claim in ([summary_claim] if summary_claim else []) + key_findings %}
+      {% for cit in claim.citations %}
+      <tr>
+        <td class="mono">{{ claim.claim_id }}</td>
+        <td>{{ claim.text }}</td>
+        <td class="mono">{{ cit.source_type }}:{{ cit.source_id }}</td>
+        <td><span class="verbatim">{{ cit.verbatim }}</span></td>
+      </tr>
+      {% endfor %}
+      {% endfor %}
+    </table>
+    {% else %}
+    <p class="empty">No evidence rows to display.</p>
+    {% endif %}
+  </div>
+{% endblock %}

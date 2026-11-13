@@ -1,0 +1,103 @@
+EVERY required key must be present, EVEN IF THE ARRAY IS EMPTY.
+If there is nothing to abstain about, emit "abstentions": [].
+If there are no gaps, emit "gaps": [].
+
+CRITICAL: Refer to the sample by its `primary_filename` or `orig_filename`. Do NOT use the sandbox-generated `.bin.exe` names. Ignore mDNS (.local), multicast (224.0.0.x), and reverse DNS (.arpa) traffic as these are background OS noise, not malicious behaviors.
+
+TASK: Produce the executive summary and risk report for this sandbox analysis.
+
+AUDIENCE: a CISO who will forward this to a CEO, CFO, or board. They are not
+technical. They will not read MITRE IDs or file paths in the narrative. They
+will decide whether to escalate based on the summary paragraph and the risk
+rating alone.
+
+INPUT A — evidence facts (sanitized). Each item has fact_id, category, key,
+value, verbatim.
+{{EVIDENCE_FACTS_JSON}}
+
+INPUT B — retrieval chunks (sanitized). Each item has chunk_id, source_id,
+title, text, metadata.
+{{RETRIEVAL_CHUNKS_JSON}}
+
+INPUT C — extraction notes.
+insufficient_evidence: {{INSUFFICIENT_EVIDENCE_JSON}}
+retrieval_confidence: {{RETRIEVAL_CONFIDENCE_JSON}}
+
+OUTPUT — one JSON object with exactly these keys:
+{
+  "risk_level": "none|low|medium|high|critical|unknown",
+  "summary_claim_id": "c1",
+  "key_finding_ids": ["c2", "c3"],
+  "mitre_techniques": [
+    {"technique_id":"T####.###","name":"...","evidence_claim_ids":["c2"]}
+  ],
+  "claims": [
+    {"claim_id":"c1","text":"...","citations":[{"citation_id":"cit1","source_type":"evidence|knowledge","source_id":"<fact_id or chunk_id>","verbatim":"<exact substring>"}],"status":"verified"},
+    {"claim_id":"c2","text":"...","citations":[...],"status":"verified"}
+  ],
+  "abstentions": [{"section":"...","reason":"...","evidence_gap":"..."}],
+  "insufficient_evidence": false
+}
+
+CRITICAL SHAPE RULES
+- summary_claim_id MUST be a string ID, not an object.
+- key_finding_ids MUST be an array of string IDs, not objects.
+- mitre_techniques[].evidence_claim_ids MUST be an array of string IDs.
+- Every ID that appears in summary_claim_id, key_finding_ids, or
+  mitre_techniques[].evidence_claim_ids MUST also appear as a full claim
+  object inside "claims" with the same claim_id.
+- Do NOT repeat claim text in summary_claim_id or key_finding_ids. Only the ID.
+
+SUMMARY CLAIM — follow this sentence structure exactly:
+  Sentence 1: what was submitted (file type, not filename or hash) and what
+    the analysis observed.
+  Sentence 2: the business consequence if this sample reached a real endpoint,
+    phrased in terms a non-technical reader understands (data loss, service
+    disruption, credential exposure, persistence, or "no discernible impact").
+  Sentence 3: the confidence of this assessment, phrased as a plain statement
+    ("The assessment is well supported by sandbox telemetry" or "The assessment
+    is limited because the sample did not execute in the sandbox").
+  Optional Sentence 4: a single recommended immediate action, if the risk
+    level is medium or higher.
+  Do not use MITRE technique IDs, fact IDs, file hashes, or file paths in the
+  summary. Those belong in the supporting claims, not the executive narrative.
+  Example of acceptable phrasing: "A Windows executable was submitted for
+  analysis. Our Linux-based sandbox could not run it, so we observed no
+  runtime behavior; if delivered to a Windows endpoint it would execute as a
+  native binary with the privileges of the logged-in user. The assessment is
+  limited by the absence of runtime telemetry, and we cannot determine intent
+  from static properties alone. We recommend a Windows-hosted re-analysis
+  before any decision to allow this file."
+
+KEY FINDINGS — each finding must follow this pattern:
+  - The observation, in plain language. What the sample did, or failed to do.
+  - Then, in the same sentence or the next, the business relevance. Why a
+    decision maker should care, or why they should not.
+  - Do not include the evidence citation text in the finding prose. Citations
+    attach to the claim object and are rendered separately.
+  - Do not start a finding with "The sample". Start with the observed activity
+    or its consequence. Example: "Attempted execution of a Windows binary on a
+    Linux host was blocked by the operating system, so no malicious behavior
+    could be observed." is acceptable; "The sample wrote a Run key" is not
+    (too technical, no business framing).
+
+RISK LEVEL — assign from observed behavior and confidence together:
+  - "none": evidence affirmatively shows benign behavior, no suspicious pattern.
+  - "low": minor suspicious properties, no confirmed malicious behavior.
+  - "medium": behaviors consistent with intent to harm, limited impact if run.
+  - "high": behaviors consistent with intent to harm, material impact if run.
+  - "critical": active compromise behaviors; would require immediate response.
+  - "unknown": telemetry insufficient to assign a rating; do not guess.
+
+MITRE TECHNIQUES — include a technique only if a cited claim directly evidences
+it. Do not pad. If none are evidenced, output an empty array. Names should
+match the official ATT&CK technique name.
+
+ABSTENTIONS — every gap between what the evidence shows and what a reader
+would expect a complete assessment to cover gets an entry. Phrase in plain
+language. Example: {"section":"runtime_behavior","reason":"the executable did
+not run in the sandbox because the platform is incompatible","evidence_gap":"no
+process, file, registry, or network telemetry was produced"}.
+
+If retrieval_confidence.sufficient is false, do not cite any knowledge chunk.
+Use evidence citations only and narrow your claims to what the evidence shows.

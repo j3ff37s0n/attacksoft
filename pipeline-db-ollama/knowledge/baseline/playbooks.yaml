@@ -1,0 +1,321 @@
+entries:
+  - id: "playbook:email.delivery"
+    source_type: "baseline-playbook"
+    title: "Playbook: Email-borne delivery response"
+    playbook_id: "playbook:email.delivery"
+    published_at: "2025-01-01"
+    text: >
+      Email-borne delivery is confirmed by a mail-related process writing a
+      payload to disk, or by a document reader spawning a child process.
+      Collect the original message headers, extract URLs and attachment hashes,
+      and block the sender domain and payload URL at the mail gateway. Search
+      for other recipients of the same message and quarantine matching
+      attachments. Do not treat a single blocked sender as containment; the
+      campaign may use multiple domains.
+
+  - id: "playbook:phishing.credential-harvest"
+    source_type: "baseline-playbook"
+    title: "Playbook: Phishing credential-harvest response"
+    playbook_id: "playbook:phishing.credential-harvest"
+    published_at: "2025-01-01"
+    text: >
+      Credential-harvest phishing is indicated by a browser or mail client
+      opening a login page on a domain that is not the organization's identity
+      provider, followed by form submission. Reset credentials for any user who
+      submitted the form, revoke active sessions, and enforce MFA re-enrollment.
+      Block the harvesting domain and search proxy logs for other users who
+      reached it. If the page captured session cookies, invalidate tokens rather
+      than only changing the password.
+
+  - id: "playbook:credential.lsass"
+    source_type: "baseline-playbook"
+    title: "Playbook: LSASS credential access response"
+    playbook_id: "playbook:credential.lsass"
+    published_at: "2025-01-01"
+    text: >
+      LSASS credential access is indicated by a non-system process opening
+      lsass.exe with read memory rights, or by a minidump of lsass being written
+      to disk. Isolate the host, reset credentials for every account that logged
+      on to it since the suspected access time, and rotate computer account
+      passwords. Treat all cached credentials as compromised, including service
+      accounts and saved browser credentials. Reimage rather than clean if the
+      dumping tool ran with administrative rights.
+
+  - id: "playbook:credential.linux-shadow"
+    source_type: "baseline-playbook"
+    title: "Playbook: Linux shadow file access response"
+    playbook_id: "playbook:credential.linux-shadow"
+    published_at: "2025-01-01"
+    text: >
+      Linux credential access is indicated by an unexpected process reading
+      /etc/shadow or a user's SSH private keys. Identify the reading process
+      from auditd or Sysmon for Linux, isolate the host, and rotate every
+      password hash that was exposed. Replace exposed SSH keys and remove them
+      from authorized_keys on other hosts. If the process ran as root, assume
+      full host compromise and rebuild.
+
+  - id: "playbook:persistence.runkey"
+    source_type: "baseline-playbook"
+    title: "Playbook: Run-key persistence response"
+    playbook_id: "playbook:persistence.runkey"
+    published_at: "2025-01-01"
+    text: >
+      Run-key persistence is indicated by a write to HKCU or HKLM
+      Software\Microsoft\Windows\CurrentVersion\Run that points at a
+      user-writable path or a file whose hash matches the analyzed sample.
+      Enumerate the key, hash every target binary, and remove entries whose
+      hash matches. Check the same key on other hosts that received the same
+      payload. Removal without identifying the dropper will usually result in
+      the key being recreated.
+
+  - id: "playbook:persistence.systemd"
+    source_type: "baseline-playbook"
+    title: "Playbook: systemd persistence response"
+    playbook_id: "playbook:persistence.systemd"
+    published_at: "2025-01-01"
+    text: >
+      systemd persistence is indicated by a new unit file under
+      /etc/systemd/system or ~/.config/systemd/user, or by a modified
+      ExecStart that points at a user-writable binary. Inspect the unit,
+      hash its target, and disable it with systemctl disable --now before
+      deleting the file. Check for drop-in overrides under .d/ that may
+      restore the original unit. Reboot or daemon-reload only after the
+      dropper has been removed.
+
+  - id: "playbook:persistence.cron"
+    source_type: "baseline-playbook"
+    title: "Playbook: Cron persistence response"
+    playbook_id: "playbook:persistence.cron"
+    published_at: "2025-01-01"
+    text: >
+      Cron persistence is indicated by a new entry in /etc/crontab,
+      /etc/cron.d, or a user crontab that invokes a user-writable binary.
+      Dump all crontabs, identify entries whose command hash matches the
+      sample, and remove them. Check at, systemd timers, and anacron as
+      alternative schedulers. A cron entry that downloads its payload will
+      recreate the binary, so block the download URL as well.
+
+  - id: "playbook:lateral.smb"
+    source_type: "baseline-playbook"
+    title: "Playbook: SMB lateral movement response"
+    playbook_id: "playbook:lateral.smb"
+    published_at: "2025-01-01"
+    text: >
+      SMB lateral movement is indicated by outbound 445/tcp from a compromised
+      host to other internal systems, often followed by admin-share access or
+      service creation. Isolate the source host and enumerate remote-access
+      events on every target it reached. Reset credentials used for the SMB
+      session. Do not rely on disabling SMBv1 alone; the session may use SMBv3
+      with stolen credentials.
+
+  - id: "playbook:lateral.rdp"
+    source_type: "baseline-playbook"
+    title: "Playbook: RDP lateral movement response"
+    playbook_id: "playbook:lateral.rdp"
+    published_at: "2025-01-01"
+    text: >
+      RDP lateral movement is indicated by outbound 3389/tcp from a compromised
+      host followed by a successful logon on the target. Identify the account
+      used, reset its credentials, and review the target's Security log for
+      logon type 10. Isolate both hosts. If the session used a stolen token or
+      hash, password reset alone is insufficient; invalidate sessions and
+      rebuild the source host.
+
+  - id: "playbook:ransomware.containment"
+    source_type: "baseline-playbook"
+    title: "Playbook: Ransomware containment response"
+    playbook_id: "playbook:ransomware.containment"
+    published_at: "2025-01-01"
+    text: >
+      Ransomware is indicated by mass file renaming, encryption, or a ransom
+      note. Immediately isolate affected hosts and disable shared drives.
+      Preserve one encrypted host for forensics before reimaging. Identify the
+      initial access vector from the oldest encrypted host, not the loudest
+      one. Restore from backups only after the initial access vector is closed
+      and the backup catalog is verified unencrypted.
+
+  - id: "playbook:execution.powershell"
+    source_type: "baseline-playbook"
+    title: "Playbook: PowerShell execution response"
+    playbook_id: "playbook:execution.powershell"
+    published_at: "2025-01-01"
+    text: >
+      PowerShell execution with ExecutionPolicy Bypass, hidden window, or
+      encoded command is a high-fidelity scripted-malware indicator. Collect
+      script block logging (4104) and PowerShell operational logs (4103),
+      reconstruct the full script, and extract every URL and file path it
+      touched. Block those indicators and quarantine downloaded payloads.
+      Check the parent process chain to find the dropper.
+
+  - id: "playbook:execution.linux-shell"
+    source_type: "baseline-playbook"
+    title: "Playbook: Linux shell execution response"
+    playbook_id: "playbook:execution.linux-shell"
+    published_at: "2025-01-01"
+    text: >
+      Linux shell execution is suspicious when a web service, document reader,
+      or unexpected parent spawns sh -c with a download-and-execute pattern.
+      Capture the full command line, the parent process, and any files written
+      under /tmp, /dev/shm, or the user's home. Kill the process tree and
+      remove the payload. If the parent is a network-facing service, treat the
+      service account as compromised.
+
+  - id: "playbook:analysis.wrong-platform"
+    source_type: "baseline-playbook"
+    title: "Playbook: PE executable on Linux sandbox"
+    playbook_id: "playbook:analysis.wrong-platform"
+    published_at: "2025-01-01"
+    text: >
+      When a Windows PE is submitted to a Linux sandbox and fails with Exec
+      format error, the sandbox cannot observe runtime behavior. Confirm from
+      agent stderr and Sysmon that no child processes were spawned by the
+      target. Report static analysis only, abstain from behavioral claims, and
+      score the file on its static characteristics rather than observed
+      behavior. Do not treat the absence of behavior as evidence of benign
+      intent.
+
+  - id: "playbook:c2.http-beacon"
+    source_type: "baseline-playbook"
+    title: "Playbook: HTTP beacon response"
+    playbook_id: "playbook:c2.http-beacon"
+    published_at: "2025-01-01"
+    text: >
+      HTTP beaconing is indicated by repeated requests to the same host at a
+      regular interval, often with a fixed user-agent and a URI that encodes
+      host identity. Extract the destination, URI pattern, user-agent, and TLS
+      certificate subject. Block at the proxy and DNS layer. Search for other
+      hosts making the same request pattern, which is more reliable than
+      blocking a single IP.
+
+  - id: "playbook:c2.dns-tunnel"
+    source_type: "baseline-playbook"
+    title: "Playbook: DNS tunnel response"
+    playbook_id: "playbook:c2.dns-tunnel"
+    published_at: "2025-01-01"
+    text: >
+      DNS tunneling is indicated by long, high-entropy subdomains, high query
+      volume to a single authoritative server, or TXT/NULL record abuse.
+      Capture the query names, identify the authoritative NS, and block the
+      domain at the resolver. Check for a local resolver process making the
+      queries. DNS blocking is effective only if the client uses the controlled
+      resolver; verify endpoint DNS configuration.
+
+  - id: "playbook:discovery.enumeration"
+    source_type: "baseline-playbook"
+    title: "Playbook: Host discovery response"
+    playbook_id: "playbook:discovery.enumeration"
+    published_at: "2025-01-01"
+    text: >
+      Host discovery is indicated by rapid connections to many internal
+      addresses on common ports, or by execution of whoami, net user, systeminfo,
+      or equivalent enumeration commands. Correlate the source process with
+      the account that ran it. Discovery usually precedes lateral movement;
+      isolate the host before the next stage. Preserve the process tree because
+      the enumeration tool is often a signed binary used as a living-off-the-land
+      binary.
+
+  - id: "nist:800-61-3.2"
+    source_type: "baseline-nist"
+    title: "NIST SP 800-61: Detection and analysis"
+    published_at: "2012-08-01"
+    text: >
+      NIST SP 800-61 recommends correlating precursor and indicator sources,
+      validating alerts against known baselines, and documenting the analysis
+      path. Analysts should prioritize high-fidelity indicators and avoid
+      escalating low-fidelity alerts without context. Detection is iterative:
+      new evidence should refine the incident scope rather than confirm the
+      first hypothesis.
+
+  - id: "nist:800-61-3.3"
+    source_type: "baseline-nist"
+    title: "NIST SP 800-61: Containment, eradication, and recovery"
+    published_at: "2012-08-01"
+    text: >
+      Containment strategy depends on the incident type and business impact.
+      Prefer short-term containment that preserves evidence, then long-term
+      containment that closes the initial access vector. Eradication removes
+      the root cause, not only the observable payload. Recovery should be
+      monitored for recurrence, and the incident should feed back into
+      detection tuning.
+
+  - id: "owasp:A03"
+    source_type: "baseline-owasp"
+    title: "OWASP Top 10 A03:2021 Injection"
+    published_at: "2021-09-24"
+    text: >
+      Injection occurs when untrusted data is interpreted as code or a command.
+      The primary defense is separating code from data through parameterized
+      queries, safe APIs, and allowlist validation. Shell invocation of user
+      input is a high-risk pattern even when quoting is attempted. Detection
+      focuses on concatenated queries and command strings containing user
+      input.
+
+  - id: "owasp:A01"
+    source_type: "baseline-owasp"
+    title: "OWASP Top 10 A01:2021 Broken Access Control"
+    published_at: "2021-09-24"
+    text: >
+      Broken access control allows a user to act outside their intended
+      permissions. Common forms are missing object-level checks, forced
+      browsing, and insecure direct object references. The defense is
+      server-side authorization on every request, deny by default, and
+      ownership checks tied to the authenticated principal. Client-side
+      controls are not access control.
+
+  - id: "cwe:CWE-78"
+    source_type: "baseline-cwe"
+    title: "CWE-78 OS Command Injection"
+    published_at: "2024-01-01"
+    text: >
+      CWE-78 describes construction of an OS command using externally
+      influenced input without neutralizing special elements. The weakness
+      leads to arbitrary command execution with the privileges of the invoking
+      process. Mitigations are avoiding shell invocation, using structured
+      APIs, and validating against a strict allowlist. Detection focuses on
+      command strings that concatenate user input.
+
+  - id: "cwe:CWE-94"
+    source_type: "baseline-cwe"
+    title: "CWE-94 Improper Control of Code Generation"
+    published_at: "2024-01-01"
+    text: >
+      CWE-94 describes code generation from externally influenced input without
+      ensuring the code is safe. In interpreted languages this is commonly
+      eval, exec, or template injection. The defense is never passing user input
+      to an evaluator; use data-only formats and fixed templates. Detection
+      focuses on dynamic evaluation of strings that include request data.
+
+  - id: "cwe:CWE-287"
+    source_type: "baseline-cwe"
+    title: "CWE-287 Improper Authentication"
+    published_at: "2024-01-01"
+    text: >
+      CWE-287 describes authentication that can be bypassed or does not
+      correctly verify identity. Common causes are missing checks, trust in
+      client-supplied identity, and fallback to weaker methods. Mitigations are
+      centralized authentication, verified session state, and fail-closed
+      behavior. Detection focuses on endpoints that accept identity claims
+      without server-side verification.
+
+  - id: "capec:CAPEC-88"
+    source_type: "baseline-capec"
+    title: "CAPEC-88 OS Command Injection"
+    published_at: "2024-01-01"
+    text: >
+      CAPEC-88 describes an adversary injecting OS commands through an
+      application interface. The attack pattern requires an input path that
+      reaches a shell or command interpreter. Mitigations are the same as
+      CWE-78: avoid shell invocation and enforce allowlist validation.
+      Detection focuses on command strings that include request-controlled
+      data.
+
+  - id: "capec:CAPEC-242"
+    source_type: "baseline-capec"
+    title: "CAPEC-242 Code Injection"
+    published_at: "2024-01-01"
+    text: >
+      CAPEC-242 describes an adversary injecting code that the application
+      later executes. This includes eval injection, template injection, and
+      deserialization of untrusted data. Mitigations are to avoid dynamic
+      evaluation, use safe serializers, and isolate template contexts.
+      Detection focuses on input that reaches an evaluator or deserializer.

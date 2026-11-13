@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pipeline.local/schemas/common.schema.json",
+  "$defs": {
+    "Uuid": { "type": "string", "format": "uuid" },
+    "Sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "IsoUtc": { "type": "string", "format": "date-time" },
+    "DateOnly": { "type": "string", "format": "date" },
+    "SourceRef": {
+      "type": "object",
+      "required": ["source_type", "source_id", "locator", "sha256"],
+      "properties": {
+        "source_type": { "enum": ["evidence", "knowledge", "submission_db", "artifact"] },
+        "source_id": { "type": "string" },
+        "artifact": { "type": "string" },
+        "locator": { "type": "string" },
+        "sha256": { "$ref": "#/$defs/Sha256" },
+        "verbatim": { "type": "string", "maxLength": 500 }
+      },
+      "additionalProperties": false
+    },
+    "Citation": {
+      "type": "object",
+      "required": ["citation_id", "source_type", "source_id", "verbatim", "verified"],
+      "properties": {
+        "citation_id": { "type": "string" },
+        "source_type": { "enum": ["evidence", "knowledge", "submission_db"] },
+        "source_id": { "type": "string" },
+        "artifact": { "type": "string" },
+        "locator": { "type": "string" },
+        "verbatim": { "type": "string", "maxLength": 300 },
+        "sha256": { "$ref": "#/$defs/Sha256" },
+        "verified": { "type": "boolean" },
+        "verification_error": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "Claim": {
+      "type": "object",
+      "required": ["claim_id", "text", "citations", "status"],
+      "properties": {
+        "claim_id": { "type": "string", "maxLength": 300 },
+        "text": { "type": "string", "maxLength": 300 },
+        "citations": { "type": "array", "minItems": 1, "maxItems": 2, "items": { "$ref": "#/$defs/Citation" } },
+        "status": { "enum": ["verified", "unverified", "removed", "abstained"] },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "ClaimLong": {
+      "type": "object",
+      "required": ["claim_id", "text", "citations", "status"],
+      "properties": {
+        "claim_id": { "type": "string", "maxLength": 300 },
+        "text": { "type": "string", "maxLength": 3000 },
+        "citations": { "type": "array", "minItems": 1, "maxItems": 2, "items": { "$ref": "#/$defs/Citation" } },
+        "status": { "enum": ["verified", "unverified", "removed", "abstained"] },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+      },
+      "additionalProperties": false
+    }
+  }
+}

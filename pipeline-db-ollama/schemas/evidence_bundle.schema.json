@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pipeline.local/schemas/evidence_bundle.schema.json",
+  "type": "object",
+  "required": [
+    "schema_version", "submission_id", "cuckoo_task_id", "analysis_date",
+    "extracted_at", "extractor_version", "task_selection", "artifacts",
+    "binary", "facts", "pcap_summary", "screenshots", "absent_artifacts",
+    "insufficient_evidence", "extraction_warnings"
+  ],
+  "properties": {
+    "schema_version": { "const": "evidence-bundle/1.0" },
+    "submission_id": { "$ref": "common.schema.json#/$defs/Uuid" },
+    "cuckoo_task_id": { "type": "string", "minLength": 1 },
+    "analysis_date": { "type": "string", "pattern": "^[0-9]{8}$" },
+    "extracted_at": { "$ref": "common.schema.json#/$defs/IsoUtc" },
+    "extractor_version": { "type": "string" },
+    "sanitization_manifest_id": { "type": ["string", "null"] },
+    "task_selection": {
+      "type": "object",
+      "required": ["policy", "selected_task_dir", "reason", "additional_tasks"],
+      "properties": {
+        "policy": { "enum": ["single_task", "select_richest_task"] },
+        "selected_task_dir": { "type": "string", "pattern": "^task_[0-9]+$" },
+        "reason": { "type": "string" },
+        "additional_tasks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["task_dir", "artifact_presence", "fact_count", "reason_not_selected"],
+            "properties": {
+              "task_dir": { "type": "string", "pattern": "^task_[0-9]+$" },
+              "artifact_presence": { "type": "object", "additionalProperties": { "type": "boolean" } },
+              "fact_count": { "type": "integer", "minimum": 0 },
+              "reason_not_selected": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["artifact_name", "relative_path", "present", "parser_status"],
+        "properties": {
+          "artifact_name": { "type": "string" },
+          "relative_path": { "type": "string" },
+          "present": { "type": "boolean" },
+          "size_bytes": { "type": ["integer", "null"], "minimum": 0 },
+          "sha256": { "oneOf": [{ "$ref": "common.schema.json#/$defs/Sha256" }, { "type": "null" }] },
+          "parser_status": { "enum": ["parsed", "absent", "empty", "parse_error", "not_applicable"] },
+          "parser_error": { "type": ["string", "null"] }
+        },
+        "additionalProperties": false
+      }
+    },
+    "binary": {
+      "type": "object",
+      "required": ["sha256", "size_bytes", "realpath_resolved", "file_type", "link_present"],
+      "properties": {
+        "sha256": { "$ref": "common.schema.json#/$defs/Sha256" },
+        "size_bytes": { "type": "integer", "minimum": 0 },
+        "realpath_resolved": { "const": true },
+        "file_type": { "type": "string" },
+        "link_present": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "facts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["fact_id", "category", "key", "value", "source", "verbatim", "authoritative"],
+        "properties": {
+          "fact_id": { "type": "string" },
+          "category": {
+            "enum": [
+              "metadata", "process", "network", "dns", "http", "tls", "file",
+              "registry", "service", "mutex", "pipe", "credential_access",
+              "persistence", "screenshot", "command_line", "user", "other"
+            ]
+          },
+          "key": { "type": "string" },
+          "value": { "type": ["string", "number", "boolean"] },
+          "source": { "$ref": "common.schema.json#/$defs/SourceRef" },
+          "verbatim": { "type": "string" },
+          "authoritative": { "type": "boolean" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "pcap_summary": {
+      "type": "object",
+      "required": ["present", "packet_count", "flows", "dns_queries", "http_requests", "tls_sessions", "parse_error"],
+      "properties": {
+        "present": { "type": "boolean" },
+        "packet_count": { "type": "integer", "minimum": 0 },
+        "flows": { "type": "array", "items": { "type": "object" } },
+        "dns_queries": { "type": "array", "items": { "type": "object" } },
+        "http_requests": { "type": "array", "items": { "type": "object" } },
+        "tls_sessions": { "type": "array", "items": { "type": "object" } },
+        "parse_error": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "screenshots": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["relative_path", "sha256"],
+        "properties": {
+          "relative_path": { "type": "string" },
+          "sha256": { "$ref": "common.schema.json#/$defs/Sha256" },
+          "width": { "type": ["integer", "null"] },
+          "height": { "type": ["integer", "null"] },
+          "captured_at": { "type": ["string", "null"] }
+        },
+        "additionalProperties": false
+      }
+    },
+    "absent_artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["relative_path", "reason"],
+        "properties": {
+          "relative_path": { "type": "string" },
+          "reason": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "insufficient_evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["section", "reason", "required_artifact"],
+        "properties": {
+          "section": { "type": "string" },
+          "reason": { "type": "string" },
+          "required_artifact": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "extraction_warnings": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": false
+}

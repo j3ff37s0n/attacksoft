@@ -1,0 +1,26 @@
+You are assembling the final Timeline / Attack Chain report. You have:
+
+1. EVIDENCE_JSON — verified behavioral claims with claim_id, text, citations.
+2. TIMELINE_JSON — the draft events and steps the small model extracted: events (each with event_id, timestamp, event_type, description_claim_id), steps (each with step_id, phase, technique_id, description_claim_id), candidate_claim_ids.
+
+YOUR JOB: select which events and steps to include, and which claim describes the overall attack chain.
+
+Requirements:
+- attack_chain_narrative_claim_id: pick one claim_id from EVIDENCE_JSON.claims that best narrates the attack chain as a whole. Must reference an existing claim_id. If no claims exist, return an empty string "".
+- timeline_event_ids: pick up to 40 event IDs from TIMELINE_JSON.events, ordered most important first. The pipeline will use events in this order. Preserve the chronological meaning — if two events must stay in relative order, keep them adjacent.
+- attack_chain_step_ids: pick up to 8 step IDs from TIMELINE_JSON.steps.
+- gaps: list any evidence gaps that would have improved this analysis (max 3). Each is {"section": "...", "reason": "..."}.
+
+Output one JSON object with exactly these keys:
+{
+  "attack_chain_narrative_claim_id": "c5",
+  "timeline_event_ids": ["e1", "e2", "e3"],
+  "attack_chain_step_ids": ["s1", "s2"],
+  "gaps": [{"section": "network", "reason": "pcap absent"}]
+}
+
+EVIDENCE_JSON:
+{{EVIDENCE_JSON}}
+
+TIMELINE_JSON:
+{{TIMELINE_JSON}}

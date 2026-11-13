@@ -1,0 +1,42 @@
+You are assembling the final Remediation report. You have:
+
+1. EVIDENCE_JSON — behavioral claims with claim_id, text, citations.
+2. SAMPLE_FEATURES_JSON — static properties including versioninfo (ProductName, ProductVersion, FileDescription), PE imports (e.g. "KERNEL32.dll!CryptEncrypt"), PEiD signatures, Cuckoo report signatures, Cuckoo ATT&CK mappings.
+3. RETRIEVAL_CHUNKS_JSON — chunks retrieved from the security knowledge base. These include mitigation playbooks, CVE descriptions, ATT&CK mitigation guidance, and baseline frameworks.
+
+YOUR JOB: use the sample's behavior AND static features to match against the knowledge base and produce actionable recommendations.
+
+Decision process:
+- If the sample has NO behavioral evidence (no process, no network, no file write, no registry from the sample itself), return an abstention: threat_model_claim_id null, recommendations empty, abstention_reason explaining that only static properties were observed and no behavior warrants a specific remediation.
+- If versioninfo matches a CVE in the retrieval chunks (ProductName + ProductVersion ↔ CVE.affected), include a recommendation referencing that CVE by ID with a specific patch/mitigate action.
+- If PE imports reveal capability (CryptEncrypt → ransomware prep, CreateRemoteThread → injection, WinExec/ShellExecuteW → execution, URLDownloadToFile/WinHttpOpen → download, AdjustTokenPrivileges → privesc), pick the matching playbook from the retrieval chunks and write a recommendation grounded in the specific import.
+- If PEiD or report signatures match known families in the retrieval chunks, include family-specific playbook steps.
+- Every recommendation must cite rationale_claim_id pointing to an evidence claim. If no evidence claim matches a recommendation, do not invent one — drop the recommendation.
+
+Output one JSON object with exactly these keys:
+{
+  "threat_model_claim_id": "<claim_id from evidence.claims or null>",
+  "abstention_reason": "<only if no recommendations>",
+  "recommendations": [
+    {
+      "recommendation_id": "r1",
+      "category": "general",
+      "priority": "medium",
+      "action": "<10+ words describing what to do>",
+      "rationale_claim_id": "<claim_id from EVIDENCE_JSON.claims>",
+      "playbook_id": "<playbook identifier from retrieval, or 'baseline'>",
+      "verification": "<10+ words describing how to verify>",
+      "applies_to": ["<affected asset>"],
+      "addresses_phases": ["<phase>"]
+    }
+  ]
+}
+
+EVIDENCE_JSON:
+{{EVIDENCE_JSON}}
+
+SAMPLE_FEATURES_JSON:
+{{SAMPLE_FEATURES_JSON}}
+
+RETRIEVAL_CHUNKS_JSON:
+{{RETRIEVAL_CHUNKS_JSON}}

@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Threat Model</h2>
+  {% if threat_model_claim %}
+  <div class="summary-box">
+    <p>{{ threat_model_claim.text }}</p>
+  </div>
+  {% else %}
+  <p class="empty">No threat model was produced.</p>
+  {% endif %}
+
+  <h2>Attack Chain Coverage</h2>
+  <p class="empty">Which observed attack phase each recommendation addresses.</p>
+  {% if phase_coverage %}
+  <table>
+    <tr><th>Observed Phase</th><th>Technique</th><th>Recommendations</th></tr>
+    {% for p in phase_coverage %}
+    <tr>
+      <td>{{ p.phase|replace("_", " ")|title }}</td>
+      <td class="mono">{{ p.technique_id }}</td>
+      <td class="mono">
+        {% set recs = remediation_by_phase.get(p.phase, []) %}
+        {% if recs %}{{ recs|map(attribute="recommendation_id")|join(", ") }}{% else %}<span style="color:#b00">no recommendation covers this phase</span>{% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p class="empty">No attack phases were observed; recommendations cover analysis limitations only.</p>
+  {% endif %}
+
+  <h2>Recommendations</h2>
+  {% if recommendations %}
+  {% for rec in recommendations %}
+  <div class="claim">
+    <h3>
+      {{ rec.recommendation_id }} &mdash;
+      <span class="priority-{{ rec.priority }}" style="font-weight:bold;">{{ rec.priority|upper }}</span> &mdash;
+      {{ rec.category|replace("_", " ")|title }}
+    </h3>
+    <p><strong>Addresses phases:</strong>
+      {% for ph in rec.addresses_phases %}{{ ph|replace("_", " ") }}{% if not loop.last %}, {% endif %}{% endfor %}
+    </p>
+    <p><strong>Action:</strong> {{ rec.action }}</p>
+    <p><strong>Verification:</strong> {{ rec.verification }}</p>
+    <p><strong>Playbook:</strong> <span class="mono">{{ rec.playbook_id }}</span></p>
+    <p><strong>Applies to:</strong></p>
+    <ul>
+      {% for item in rec.applies_to %}<li><span class="verbatim">{{ item }}</span></li>{% endfor %}
+    </ul>
+    {% set rationale = claims_by_id.get(rec.rationale_claim_id) %}
+    {% if rationale %}
+    <p><strong>Rationale ({{ rationale.claim_id }}):</strong> {{ rationale.text }}</p>
+    <ul class="citations">
+      {% for cit in rationale.citations %}
+      <li class="citation"><span class="citation-label">{{ cit.source_type }}:</span> {{ cit.source_id }} &mdash; <span class="verbatim">{{ cit.verbatim }}</span></li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </div>
+  {% endfor %}
+  {% else %}
+  <p class="empty">No recommendations were produced.</p>
+  {% endif %}
+
+  <h2>Consolidated Network Indicators to Block or Hunt</h2>
+  <p class="empty">Every destination observed in the evidence bundle. Use as the blocklist and hunt pivot set.</p>
+  {% if network_summary.rows %}
+  <table>
+    <tr><th>Destination</th><th>Port</th><th>Protocol</th><th>Authoritative</th></tr>
+    {% for r in network_summary.rows %}
+    <tr>
+      <td class="mono verbatim">{{ r.dst }}</td>
+      <td class="mono">{{ r.port }}</td>
+      <td class="mono">{{ r.proto }}</td>
+      <td>{{ "yes" if r.authoritative else "no" }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p class="empty">No network indicators were captured.</p>
+  {% endif %}
+
+  <h2>Consolidated DNS Indicators to Block or Hunt</h2>
+  {% if dns_summary.rows %}
+  <table>
+    <tr><th>Query / Response</th><th>Source</th></tr>
+    {% for r in dns_summary.rows %}
+    <tr>
+      <td class="mono verbatim">{{ r.value }}</td>
+      <td class="mono">{{ r.kind }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p class="empty">No DNS indicators were captured.</p>
+  {% endif %}
+
+  <h2>Files to Hunt or Remove</h2>
+  {% if file_summary.rows %}
+  <table>
+    <tr><th>Path</th><th>Action</th></tr>
+    {% for r in file_summary.rows %}
+    <tr>
+      <td class="mono verbatim">{{ r.path }}</td>
+      <td>{{ r.action }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p class="empty">No file indicators were captured.</p>
+  {% endif %}
+
+  {% if abstentions %}
+  <h2>Abstentions</h2>
+  {% for a in abstentions %}
+  <div class="limitation">
+    <div class="limitation-title">{{ a.section|replace("_", " ")|title }}</div>
+    <p><strong>Reason:</strong> {{ a.reason }}</p>
+    <p><strong>Evidence gap:</strong> {{ a.evidence_gap }}</p>
+  </div>
+  {% endfor %}
+  {% endif %}
+{% endblock %}

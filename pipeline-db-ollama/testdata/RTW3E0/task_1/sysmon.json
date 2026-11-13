@@ -1,0 +1,450 @@
+[
+  {
+    "Id": 1,
+    "TimeCreated": "/Date(1793073328822)/",
+    "Message": "RuleName: -\r\nUtcTime: 2026-10-27 03:55:28.822\r\nProcessGuid: {562c42f355cd-2152-0}\r\nProcessId: 2152\r\nImage: /usr/lib/udev/probe-bcache\r\nCommandLine: /usr/lib/udev/probe-bcache -o udev /dev/sda1\r\nCurrentDirectory: /\r\nUser: 0\r\nParentProcessId: 2150\r\nParentImage: -\r\nParentCommandLine: \r\nParentUser: -",
+    "Properties": [
+      {
+        "Value": "-"
+      },
+      {
+        "Value": "2026-10-27 03:55:28.822"
+      },
+      {
+        "Value": "{562c42f355cd-2152-0}"
+      },
+      {
+        "Value": "2152"
+      },
+      {
+        "Value": "/usr/lib/udev/probe-bcache"
+      },
+      {
+        "Value": "/usr/lib/udev/probe-bcache -o udev /dev/sda1"
+      },
+      {
+        "Value": "/"
+      },
+      {
+        "Value": "0"
+      },
+      {
+        "Value": "2150"
+      },
+      {
+        "Value": "-"
+      },
+      {
+        "Value": ""
+      },
+      {
+        "Value": "-"
+      }
+    ],
+    "EventID": 1
+  },
+  {
+    "Id": 1,
+    "TimeCreated": "/Date(1793073328838)/",
+    "Message": "RuleName: -\r\nUtcTime: 2026-10-27 03:55:28.838\r\nProcessGuid: {562c42f355cd-2154-0}\r\nProcessId: 2154\r\nImage: /usr/bin/dash\r\nCommandLine: /bin/sh /usr/lib/udev/bcache-export-cached /dev/sda1\r\nCurrentDirectory: /\r\nUser: 0\r\nParentProcessId: 2150\r\nParentImage: -\r\nParentCommandLine: \r\nParentUser: -",
+    "Properties": [
+      {
+        "Value": "-"
+      },
+      {
+        "Value": "2026-10-27 03:55:28.838"
+      },
+      {
+        "Value": "{562c42f355cd-2154-0}"
+      },
+      {
+        "Value": "2154"
+      },
+      {
+        "Value": "/usr/bin/dash"
+      },
+      {
+        "Value": "/bin/sh /usr/lib/udev/bcache-export-cached /dev/sda1"
+      },
+      {
+        "Value": "/"
+      },
+      {
+        "Value": "0"
+      },
+      {
+        "Value": "2150"
+      },
+      {
+        "Value": "-"
+      },
+      {
+        "Value": ""
+      },
+      {
+        "Value": "-"
+      }
+    ],
+    "EventID": 1
+  },
+  {
+    "Id": 1,
+    "TimeCreated": "/Date(1793073329257)/",
+    "Message": "RuleName: -\r\nUtcTime: 2026-10-27 03:55:29.256\r\nProcessGuid: {562c42f355cd-2155-0}\r\nProcessId: 2155\r\nImage: /usr/bin/dash\r\nCommandLine: /bin/sh /usr/lib/udev/bcache-export-cached /dev/sda3\r\nCurrentDirectory: /\r\nUser: 0\r\nParentProcessId: 2153\r\nParentImage: -\r\nParentCommandLine: \r\nParentUser: -",
+    "Properties": [
+      {
+        "Value": "-"
+      },
+      {
+        "Value": "2026-10-27 03:55:29.256"
+      },
+      {
+        "Value": "{562c42f355cd-2155-0}"
+      },
+      {
+        "Value": "2155"
+      },
+      {
+        "Value": "/usr/bin/dash"
+      },
+      {
+        "Value": "/bin/sh /usr/lib/udev/bcache-export-cached /dev/sda3"
+      },
+      {
+        "Value": "/"
+      },
+      {
+        "Value": "0"
+      },
+      {
+        "Value": "2153"
+      },
+      {
+        "Value": "-"
+      },
+      {
+        "Value": ""
+      },
+      {
+        "Value": "-"
+      }
+    ],
+    "EventID": 1
+  },
+  {
+    "Id": 1,
+    "TimeCreated": "/Date(1793073329329)/",
+    "Message": "RuleName: -\r\nUtcTime: 2026-10-27 03:55:29.328\r\nProcessGuid: {562c42f355cd-2156-0}\r\nProcessId: 2156\r\nImage: /usr/bin/dash\r\nCommandLine: /bin/sh /usr/lib/udev/bcache-export-cached /dev/sda2\r\nCurrentDirectory: /\r\nUser: 0\r\nParentProcessId: 2151\r\nParentImage: -\r\nParentCommandLine: \r\nParentUser: -",
+    "Properties": [
+      {
+        "Value": "-"
+      },
+      {
+        "Value": "2026-10-27 03:55:29.328"
+      },
+      {
+        "Value": "{562c42f355cd-2156-0}"
+      },
+      {
+        "Value": "2156"
+      },
+      {
+        "Value": "/usr/bin/dash"
+      },
+      {
+        "Value": "/bin/sh /usr/lib/udev/bcache-export-cached /dev/sda2"
+      },
+      {
+        "Value": "/"
+      },
+      {
+        "Value": "0"
+      },
+      {
+        "Value": "2151"
+      },
+      {
+        "Value": "-"
+      },
+      {
+        "Value": ""
+      },
+      {
+        "Value": "-"
+      }
+    ],
+    "EventID": 1
+  },
+  {
+    "Id": 1,
+    "TimeCreated": "/Date(1793073334602)/",
+    "Message": "RuleName: -\r\nUtcTime: 2026-10-27 03:55:34.601\r\nProcessGuid: {562c42f355cd-2162-0}\r\nProcessId: 2162\r\nImage: /usr/bin/sed\r\nCommandLine: sed -e s/\\\\/\\\\x5c/g -e s/;/\\\\x3b/g -e 732F5B5B3A636E74726C3A5D5D2FE28DB02F67\r\nCurrentDirectory: /home/sandbox\r\nUser: 1000\r\nParentProcessId: 2160\r\nParentImage: -\r\nParentCommandLine: \r\nParentUser: -",
+    "Properties": [
+      {
+        "Value": "-"
+      },
+      {
+        "Value": "2026-10-27 03:55:34.601"
+      },
+      {
+        "Value": "{562c42f355cd-2162-0}"
+      },
+      {
+        "Value": "2162"
+      },
+      {
+        "Value": "/usr/bin/sed"
+      },
+      {
+        "Value": "sed -e s/\\\\/\\\\x5c/g -e s/;/\\\\x3b/g -e 732F5B5B3A636E74726C3A5D5D2FE28DB02F67"
+      },
+      {
+        "Value": "/home/sandbox"
+      },
+      {
+        "Value": "1000"
+      },
+      {
+        "Value": "2160"
+      },
+      {
+        "Value": "-"
+      },
+      {
+        "Value": ""
+      },
+      {
+        "Value": "-"
+      }
+    ],
+    "EventID": 1
+  },
+  {
+    "Id": 1,
+    "TimeCreated": "/Date(1793073334610)/",
+    "Message": "RuleName: -\r\nUtcTime: 2026-10-27 03:55:34.609\r\nProcessGuid: {562c42f355cd-2163-0}\r\nProcessId: 2163\r\nImage: /usr/bin/systemctl\r\nCommandLine: systemctl status cuckoo-agent --no-pager\r\nCurrentDirectory: /home/sandbox\r\nUser: 1000\r\nParentProcessId: 1458\r\nParentImage: /usr/bin/bash\r\nParentCommandLine: -bash\r\nParentUser: 1000",
+    "Properties": [
+      {
+        "Value": "-"
+      },
+      {
+        "Value": "2026-10-27 03:55:34.609"
+      },
+      {
+        "Value": "{562c42f355cd-2163-0}"
+      },
+      {
+        "Value": "2163"
+      },
+      {
+        "Value": "/usr/bin/systemctl"
+      },
+      {
+        "Value": "systemctl status cuckoo-agent --no-pager"
+      },
+      {
+        "Value": "/home/sandbox"
+      },
+      {
+        "Value": "1000"
+      },
+      {
+        "Value": "1458"
+      },
+      {
+        "Value": "/usr/bin/bash"
+      },
+      {
+        "Value": "-bash"
+      },
+      {
+        "Value": "1000"
+      }
+    ],
+    "EventID": 1
+  },
+  {
+    "Id": 11,
+    "TimeCreated": "/Date(1793073334633)/",
+    "Message": "RuleName: -\r\nUtcTime: 2026-10-27 03:55:34.632\r\nProcessGuid: {562c42f355cd-2163-0}\r\nProcessId: 2163\r\nImage: /usr/bin/systemctl\r\nTargetFilename: /etc/passwd\r\nCreationUtcTime: 2026-10-27 03:55:34.632\r\nUser: 1000",
+    "Properties": [
+      {
+        "Value": "-"
+      },
+      {
+        "Value": "2026-10-27 03:55:34.632"
+      },
+      {
+        "Value": "{562c42f355cd-2163-0}"
+      },
+      {
+        "Value": "2163"
+      },
+      {
+        "Value": "/usr/bin/systemctl"
+      },
+      {
+        "Value": "/etc/passwd"
+      },
+      {
+        "Value": "2026-10-27 03:55:34.632"
+      },
+      {
+        "Value": "1000"
+      }
+    ],
+    "EventID": 11
+  },
+  {
+    "Id": 1,
+    "TimeCreated": "/Date(1793073334648)/",
+    "Message": "RuleName: -\r\nUtcTime: 2026-10-27 03:55:34.648\r\nProcessGuid: {562c42f355cd-2167-0}\r\nProcessId: 2167\r\nImage: /usr/bin/sed\r\nCommandLine: sed -e s/\\\\/\\\\x5c/g -e s/;/\\\\x3b/g -e 732F5B5B3A636E74726C3A5D5D2FE28DB02F67\r\nCurrentDirectory: /home/sandbox\r\nUser: 1000\r\nParentProcessId: 2165\r\nParentImage: -\r\nParentCommandLine: \r\nParentUser: -",
+    "Properties": [
+      {
+        "Value": "-"
+      },
+      {
+        "Value": "2026-10-27 03:55:34.648"
+      },
+      {
+        "Value": "{562c42f355cd-2167-0}"
+      },
+      {
+        "Value": "2167"
+      },
+      {
+        "Value": "/usr/bin/sed"
+      },
+      {
+        "Value": "sed -e s/\\\\/\\\\x5c/g -e s/;/\\\\x3b/g -e 732F5B5B3A636E74726C3A5D5D2FE28DB02F67"
+      },
+      {
+        "Value": "/home/sandbox"
+      },
+      {
+        "Value": "1000"
+      },
+      {
+        "Value": "2165"
+      },
+      {
+        "Value": "-"
+      },
+      {
+        "Value": ""
+      },
+      {
+        "Value": "-"
+      }
+    ],
+    "EventID": 1
+  },
+  {
+    "Id": 3,
+    "TimeCreated": "/Date(1793073362636)/",
+    "Message": "RuleName: -\r\nUtcTime: 2026-10-27 03:56:02.635\r\nProtocol: tcp\r\nInitiated: true\r\nSourceIp: 0.0.0.0\r\nSourcePort: 0\r\nDestinationIp: 185.125.190.122\r\nDestinationPort: 123",
+    "Properties": [
+      {
+        "Value": "-"
+      },
+      {
+        "Value": "2026-10-27 03:56:02.635"
+      },
+      {
+        "Value": "tcp"
+      },
+      {
+        "Value": "true"
+      },
+      {
+        "Value": "0.0.0.0"
+      },
+      {
+        "Value": "0"
+      },
+      {
+        "Value": "185.125.190.122"
+      },
+      {
+        "Value": "123"
+      }
+    ],
+    "EventID": 3
+  },
+  {
+    "Id": 1,
+    "TimeCreated": "/Date(1793073387880)/",
+    "Message": "RuleName: -\r\nUtcTime: 2026-10-27 03:56:27.880\r\nProcessGuid: {562c42f355cd-2175-0}\r\nProcessId: 2175\r\nImage: /usr/lib/cargo/bin/coreutils/chmod\r\nCommandLine: chmod +x /home/sandbox/cuckoo/write-test.exe\r\nCurrentDirectory: /home/sandbox/cuckoo\r\nUser: 1000\r\nParentProcessId: 2174\r\nParentImage: -\r\nParentCommandLine: \r\nParentUser: -",
+    "Properties": [
+      {
+        "Value": "-"
+      },
+      {
+        "Value": "2026-10-27 03:56:27.880"
+      },
+      {
+        "Value": "{562c42f355cd-2175-0}"
+      },
+      {
+        "Value": "2175"
+      },
+      {
+        "Value": "/usr/lib/cargo/bin/coreutils/chmod"
+      },
+      {
+        "Value": "chmod +x /home/sandbox/cuckoo/write-test.exe"
+      },
+      {
+        "Value": "/home/sandbox/cuckoo"
+      },
+      {
+        "Value": "1000"
+      },
+      {
+        "Value": "2174"
+      },
+      {
+        "Value": "-"
+      },
+      {
+        "Value": ""
+      },
+      {
+        "Value": "-"
+      }
+    ],
+    "EventID": 1
+  },
+  {
+    "Id": 11,
+    "TimeCreated": "/Date(1793073387910)/",
+    "Message": "RuleName: -\r\nUtcTime: 2026-10-27 03:56:27.910\r\nProcessGuid: {562c42f355cd-2176-0}\r\nProcessId: 2176\r\nImage: /usr/bin/dash\r\nTargetFilename: /home/sandbox/cuckoo/write-test.exe\r\nCreationUtcTime: 2026-10-27 03:56:27.910\r\nUser: 1000",
+    "Properties": [
+      {
+        "Value": "-"
+      },
+      {
+        "Value": "2026-10-27 03:56:27.910"
+      },
+      {
+        "Value": "{562c42f355cd-2176-0}"
+      },
+      {
+        "Value": "2176"
+      },
+      {
+        "Value": "/usr/bin/dash"
+      },
+      {
+        "Value": "/home/sandbox/cuckoo/write-test.exe"
+      },
+      {
+        "Value": "2026-10-27 03:56:27.910"
+      },
+      {
+        "Value": "1000"
+      }
+    ],
+    "EventID": 11
+  }
+]

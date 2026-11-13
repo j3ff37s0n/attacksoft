@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pipeline.local/schemas/retrieval_result.schema.json",
+  "type": "object",
+  "required": ["schema_version", "submission_id", "generated_at", "queries", "results", "confidence"],
+  "properties": {
+    "schema_version": { "const": "retrieval-result/1.0" },
+    "submission_id": { "$ref": "common.schema.json#/$defs/Uuid" },
+    "generated_at": { "$ref": "common.schema.json#/$defs/IsoUtc" },
+    "queries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["query_id", "text", "derived_from_fact_ids", "query_type"],
+        "properties": {
+          "query_id": { "type": "string" },
+          "text": { "type": "string" },
+          "derived_from_fact_ids": { "type": "array", "items": { "type": "string" } },
+          "query_type": { "enum": ["process", "command_line", "network", "dns", "http", "tls", "file", "registry", "behavior", "technique", "playbook"] }
+        },
+        "additionalProperties": false
+      }
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["chunk_id", "source_id", "source_type", "title", "text", "score_semantic", "score_keyword", "score_fused", "provenance"],
+        "properties": {
+          "chunk_id": { "type": "string" },
+          "source_id": { "type": "string" },
+          "source_type": { "enum": ["knowledge", "submission_db"] },
+          "title": { "type": "string" },
+          "text": { "type": "string" },
+          "score_semantic": { "type": "number" },
+          "score_keyword": { "type": "number" },
+          "score_fused": { "type": "number" },
+          "metadata": { "type": "object" },
+          "provenance": { "$ref": "common.schema.json#/$defs/SourceRef" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "confidence": {
+      "type": "object",
+      "required": ["threshold", "max_score", "mean_top_k_score", "sufficient", "reason", "selected_chunk_ids"],
+      "properties": {
+        "threshold": { "type": "number" },
+        "max_score": { "type": "number" },
+        "mean_top_k_score": { "type": "number" },
+        "sufficient": { "type": "boolean" },
+        "reason": { "type": "string" },
+        "selected_chunk_ids": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

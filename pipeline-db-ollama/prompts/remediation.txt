@@ -1,0 +1,101 @@
+EVERY required key must be present, EVEN IF THE ARRAY IS EMPTY.
+If there is nothing to abstain about, emit "abstentions": [].
+If there are no gaps, emit "gaps": [].
+
+TASK: Produce remediation recommendations specific to this sample, targeting
+the full observed attack chain.
+
+AUDIENCE: an IT operations lead or security engineer who will dispatch this
+work. They need a threat model of what this foothold could become, a
+prioritized list of actions organized by attack phase, and the specific
+indicators to block or hunt.
+
+INPUT A — evidence facts (sanitized):
+{{EVIDENCE_FACTS_JSON}}
+
+INPUT B — retrieval chunks (sanitized). Playbook chunks carry
+metadata.playbook_id and describe a specific response procedure.
+{{RETRIEVAL_CHUNKS_JSON}}
+
+INPUT C — attack phases confirmed by the verified timeline report (may be
+empty if the sample did not execute):
+{{ATTACK_CHAIN_PHASES_JSON}}
+
+INPUT D — extraction notes.
+insufficient_evidence: {{INSUFFICIENT_EVIDENCE_JSON}}
+
+OUTPUT — one JSON object with exactly these keys:
+{
+  "threat_model_claim_id": "c1",
+  "recommendations": [
+    {
+      "recommendation_id": "r1",
+      "category": "email_delivery|phishing|credential_theft|persistence|lateral_movement|ransomware|general",
+      "priority": "immediate|high|medium|low",
+      "action": "...",
+      "rationale_claim_id": "c2",
+      "playbook_id": "...",
+      "verification": "...",
+      "applies_to": ["..."],
+      "addresses_phases": ["execution", "persistence"]
+    }
+  ],
+  "claims": [
+    {"claim_id":"c1","text":"...","citations":[{"citation_id":"cit1","source_type":"evidence|knowledge","source_id":"<fact_id or chunk_id>","verbatim":"<exact substring>"}],"status":"verified"}
+  ],
+  "abstentions": [{"section":"...","reason":"...","evidence_gap":"..."}]
+}
+
+CRITICAL SHAPE RULES
+- threat_model_claim_id and rationale_claim_id are STRING IDs, not objects.
+- Do NOT include "evidence_citations" or "knowledge_citations" on a
+  recommendation. Citations live on the referenced rationale claim.
+- The rationale claim MUST carry, in its own citations array, at least one
+  citation with source_type "evidence" AND at least one with source_type
+  "knowledge". A recommendation whose rationale claim lacks either is dropped.
+- addresses_phases MUST be a non-empty array of phase strings from the enum in
+  INPUT C's vocabulary: delivery, execution, persistence, privilege_escalation,
+  defense_evasion, credential_access, discovery, lateral_movement, collection,
+  command_and_control, exfiltration, impact, unknown. Every recommendation must
+  list the phase(s) of the attack chain it addresses. Prevention-oriented
+  recommendations may list phases not observed if they are downstream of what
+  was observed.
+
+THREAT MODEL (claim c1 — the first claim)
+A short paragraph that answers: given what we observed, what would a
+sophisticated actor do next? What phases of the attack chain are covered, what
+is the most likely next phase, and what does this sample's capability profile
+suggest about the actor's intent? Ground every assertion in cited evidence;
+where the answer is speculative, phrase it as such ("if this is executed on a
+Windows endpoint, the observed PE imports suggest..."). If the sample did not
+execute at all, state the threat model as "unknown intent due to no runtime
+observation" and describe what would need to happen next to raise confidence.
+The threat model cites at least one evidence fact and at least one knowledge
+chunk.
+
+RECOMMENDATIONS — full-coverage principle
+Every observed attack phase from INPUT C must be addressed by at least one
+recommendation. If the chain has three phases (execution, persistence, C2), you
+must produce at least one recommendation for each. If a phase is addressed by
+multiple controls, produce multiple recommendations and let each list the
+phase. If you have no specific playbook for a phase, still produce the
+recommendation and add an abstention explaining the playbook gap.
+
+Priority calibration:
+  - "immediate": active compromise observed or credential exposure confirmed.
+  - "high": the observed chain reaches a phase that, unchecked, allows lateral
+    movement, persistence, or exfiltration.
+  - "medium": defense-in-depth or detection additions that harden against the
+    observed behavior.
+  - "low": prevention improvements for the actor's most likely next move.
+
+Each action must name the specific observed artifact, behavior, or indicator
+it addresses. Each verification step must be runnable by an operator and name
+what to inspect. Each applies_to must reference verbatim observed values from
+your citations.
+
+If a phase was NOT observed because the sample did not execute, do not invent
+a threat chain. Produce one recommendation of category "general" that explains
+the analysis limitation, playbook_id "playbook:analysis.wrong-platform" (or the
+matching reason), and addresses_phases ["execution"]. Add an abstention for
+every phase you would otherwise have covered but could not.

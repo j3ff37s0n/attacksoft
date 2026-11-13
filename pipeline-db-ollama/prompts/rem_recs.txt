@@ -1,0 +1,7 @@
+cat > /opt/pipeline/prompts/rem_recs.txt << 'EOF'
+Generate the threat model claim ID and remediation recommendations based on the claims.
+Output JSON with exactly two keys: "threat_model_claim_id" and "recommendations".
+"threat_model_claim_id" must be one of the claim_ids from the claims array.
+Each recommendation must have: "recommendation_id", "category", "priority", "action", "rationale_claim_id" (referencing a claim_id), "playbook_id", "verification", "applies_to", and "addresses_phases".
+Claims: {{CLAIMS_JSON}}
+EOF

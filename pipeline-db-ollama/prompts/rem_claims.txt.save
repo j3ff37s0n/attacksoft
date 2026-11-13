@@ -1,0 +1,21 @@
+You extract remediation claims from the FACTS array and RETRIEVAL CHUNKS below.
+
+CONSTRAINTS (rules for you to follow — do NOT extract from this section):
+1. Exactly ONE claim per fact in the FACTS array.
+2. Each claim cites exactly TWO sources: one fact from FACTS, one chunk from RETRIEVAL CHUNKS.
+3. Claim text is 20 words or fewer.
+4. Skip facts that are not security-relevant — produce NO claim for them.
+5. The source_id field MUST be the exact string from the fact's `fact_id` field. Copy character for character. NEVER invent IDs. NEVER use words like "redacted" or the fact's `key` value (e.g., "monitored_execution", "registry_writer") as source_id. NEVER use sequential numbers like f_0, f_1, f_2. If you cannot see the exact fact_id field, produce NO claim for that fact.
+6. Copy verbatim exactly from the cited source.
+7. Omit any claim you cannot ground. Do not invent.
+
+OUTPUT FORMAT: one JSON object with a single key "claims" containing an array.
+Each claim: {"claim_id": "c1", "text": "...", "citations": [{"citation_id": "cit1", "source_type": "evidence", "source_id": "<copy_fact_id_field_exactly>", "verbatim": "<copy_verbatim_from_fact>"}, {"citation_id": "cit2", "source_type": "knowledge", "source_id": "<copy_chunk_id_field_exactly>", "verbatim": "<copy_text_from_chunk>"}]}
+
+---
+
+FACTS (extract only from this array):
+{{EVIDENCE_FACTS_JSON}}
+
+RETRIEVAL CHUNKS (extract only from this array):
+{{RETRIEVAL_CHUNKS_JSON}}

@@ -1,0 +1,2 @@
+Identify the threat model. Output JSON: {"threat_model_claim_id": "c1"}
+Claims: {{CLAIMS_JSON}}

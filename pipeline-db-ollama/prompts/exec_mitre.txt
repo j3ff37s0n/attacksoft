@@ -1,0 +1,9 @@
+CRITICAL SCOPE: Focus ONLY on the submitted executable (and any child processes it spawns). Ignore sandbox/OS background noise:
+- Windows: svchost.exe, explorer.exe, Windows Defender, lsass.exe, consent.exe, smartscreen.exe, dllhost.exe, tasklist.exe, wmic.exe, wevtutil.exe, python.exe under "C:\Users\sandbox\AppData\Local\Programs\Python", and any process whose Image or CommandLine does not reference the sample.
+- Linux: systemd, bash (unless it is the sample's direct parent), cron, sshd, dbus-daemon, kworker, kthreadd, python (agent), rsync, and any process whose command line does not reference the sample.
+If you cannot find facts tied to the submitted file, emit an empty array for this field rather than inventing claims about OS processes.
+
+Extract MITRE ATT&CK techniques based on the claims. Output JSON: {"mitre_techniques": [{"technique_id": "T####", "name": "...", "evidence_claim_ids": ["c1"]}]}
+STRICT: technique_id MUST be a real ATT&CK ID starting with "T" (e.g., T1059, T1071). name MUST be the official ATT&CK technique name from that ID. NEVER put evidence text, IP addresses, domain names, file paths, pcap-flow strings, or any claim/fact text into the name field. If no claim supports a specific technique, return {"mitre_techniques": []}.
+Claims: {{CLAIMS_JSON}}
+Facts: {{EVIDENCE_FACTS_JSON}}

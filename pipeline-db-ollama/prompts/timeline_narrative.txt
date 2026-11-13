@@ -1,0 +1,3 @@
+Write a narrative summary. Output JSON with one key "attack_chain_narrative_claim_id" that references an existing claim_id.
+Events: {{TIMELINE_EVENTS_JSON}}
+Claims: {{CLAIMS_JSON}}

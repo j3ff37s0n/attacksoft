@@ -1,0 +1,103 @@
+rem_claims = rem_c
+def _summarize_files
+def
+def _summarize_processes
+_truncate_facts
+if f.get("key") == "f
+def run_sync(mode: str
+elif srv == "kev":
+elif src == "kev"
+p_full.add_argument("--sou
+run_sync("daily", ["base
+keep_alive": "30
+keep_alive": "5
+def _genera
+def _generate_all_repo
+claims_res = _ge
+claims_res = _generate_subset("ex
+for i, c in enumerate(deduped, 1
+c["claim_id"] = f"c{i}"
+renumber all claim_ids
+all_claims: list[dict] 
+_generate_all_reports
+claims = claims_res.get("claims",
+exec_report = {
+tl_facts = _filter_facts({"process", "network"
+"evidence_facts
+def _generate_claims_chu
+rem_claims_res = _generate_subset(
+def _call_ollama(
+num_predict": num_predict, "num_ctx": 3
+def _truncate_fac
+if len(v) > Max_fact_verbat
+_generate_claims_chunked
+chunks = [facts[i:i+Facts_per_chunk] for i
+chunks = [facts[i:i+facts_per_chunk
+chunk_list = [
+facts_per_chunk = 5
+log.warning("remediation claim empty sid=%s
+log.warning("remediation
+t1_report = {
+if not tl_chunks: tl_ch
+events = events_res.get("timeline
+if len(v) > max_fact_verbatim
+select id, document, metadata
+facts_per_ch
+facts = [dict(f, verbatim=f.get
+if not result or "claims" not in re
+if not res or "claims" not in re
+timeout=
+effective_time
+effective_timeout = 
+timeout = 
+timeout=1800
+timeout=600
+chunk_size = 100
+_derive_timeline_cadidates
+"verbatim": str(fact.g
+if not tl_chunks: tl_chunks =
+event_res = _generate_subset(
+events_res = _generate_subset(
+spaced_ts_min
+slim down 
+options": {
+content = _call_ollama(
+unique_facts = [f for f
+facts_per_junk
+facts_per_c
+_generate_rem_cl
+if not result or "claims" not in r
+timeline
+_generate_t
+_generate_rem_claims_chunk
+chunk_size
+extrac_json
+extract_json
+tl_report = {
+narrative_res = _gen
+narrative_res = _ge
+log.warning("timeline chunk %d
+_truncate_chunks
+_generate_rem_claims_chunked
+exec_facts[:
+exec_facts[
+exec_fa
+: exec_facts
+if you need more
+overview
+claims": {
+citations": {
+def touch_submission(sid: str
+def set_state(
+"text": {"type": "str
+"text": { "type": "str
+verbatim": { "type": "st
+def cleanup
+write_json(pipeline_dir
+def _handle_poll(rot: dic
+def _handle_poll(row: di
+def delete_task
+microsoft security blog
+
+
+

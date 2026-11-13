@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{{ report_title }}</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 22mm 18mm 30mm 18mm;
+      @bottom-center {
+        content: {{ footer_text|tojson }};
+        font-family: 'DejaVu Sans', sans-serif;
+        font-size: 8pt;
+        color: #888;
+        text-align: center;
+        vertical-align: top;
+        border-top: 0.5pt solid #c5c5c5;
+        padding-top: 4pt;
+      }
+    }
+    body { font-family: 'DejaVu Sans', sans-serif; font-size: 10.5pt; color: #1e1e1e; line-height: 1.5; }
+    h1 { font-size: 22pt; font-weight: 600; margin: 0 0 4pt 0; color: #111; }
+    .subtitle { font-size: 10pt; color: #666; margin: 0 0 20pt 0; padding-bottom: 8pt; border-bottom: 1.5pt solid #333; }
+    h2 { font-size: 14pt; font-weight: 600; margin: 26pt 0 10pt 0; color: #111; page-break-after: avoid; }
+    h3 { font-size: 11.5pt; font-weight: 600; margin: 16pt 0 6pt 0; color: #222; page-break-after: avoid; }
+    p { margin: 4pt 0 10pt 0; }
+    ul, ol { margin: 4pt 0 10pt 0; padding-left: 22pt; }
+    li { margin: 3pt 0; }
+    .summary-box { background: #f7f9fc; border-left: 4pt solid #2a4d7a; padding: 14pt 18pt; margin: 10pt 0 18pt 0; font-size: 11pt; line-height: 1.55; page-break-inside: avoid; }
+    .summary-box p { margin: 0; }
+    .risk-banner { display: flex; align-items: center; gap: 12pt; padding: 14pt 18pt; border-radius: 4pt; margin: 6pt 0 18pt 0; page-break-inside: avoid; }
+    .risk-banner .label { font-size: 9pt; text-transform: uppercase; letter-spacing: 1pt; opacity: 0.75; }
+    .risk-banner .value { font-size: 20pt; font-weight: 700; letter-spacing: 0.5pt; }
+    .risk-banner .explanation { flex: 1; font-size: 10.5pt; line-height: 1.4; }
+    .risk-none { background: #ececec; color: #333; }
+    .risk-low { background: #dff2dc; color: #1f4a1a; }
+    .risk-medium { background: #fdf3c8; color: #5a4400; }
+    .risk-high { background: #fde0c8; color: #6b3100; }
+    .risk-critical { background: #fdd6d6; color: #7a0000; }
+    .risk-unknown { background: #f0f0f0; color: #444; }
+    .findings { list-style: none; padding: 0; margin: 8pt 0 16pt 0; counter-reset: finding; }
+    .findings li { counter-increment: finding; margin: 12pt 0; padding-left: 34pt; position: relative; page-break-inside: avoid; }
+    .findings li::before { content: counter(finding); position: absolute; left: 0; top: 0; width: 24pt; height: 24pt; line-height: 24pt; text-align: center; background: #2a4d7a; color: #fff; border-radius: 50%; font-weight: 600; font-size: 10pt; }
+    .limitation { background: #fdf7ec; border-left: 3pt solid #c58a00; padding: 10pt 14pt; margin: 10pt 0; page-break-inside: avoid; }
+    .limitation-title { font-weight: 600; color: #7a5500; font-size: 10pt; margin-bottom: 4pt; }
+    .appendix { page-break-before: always; }
+    .appendix h2 { margin-top: 0; }
+    table { width: 100%; border-collapse: collapse; margin: 8pt 0 14pt 0; font-size: 9pt; }
+    th, td { border: 0.5pt solid #c5c5c5; padding: 5pt 8pt; text-align: left; vertical-align: top; }
+    th { background: #eef2f5; font-weight: 600; }
+    tr:nth-child(even) td { background: #fafbfc; }
+    .verbatim { font-family: 'DejaVu Sans Mono', monospace; font-size: 8.5pt; background: #f0f0f0; padding: 1pt 4pt; border-radius: 2pt; word-break: break-all; overflow-wrap: anywhere; }
+    .mono { font-family: 'DejaVu Sans Mono', monospace; font-size: 9pt; }
+    .empty { color: #888; font-style: italic; font-size: 9.5pt; }
+    .attachments { page-break-before: always; }
+    .screenshot { max-width: 100%; margin: 8pt 0; border: 0.5pt solid #c5c5c5; page-break-inside: avoid; }
+    .screenshot-caption { font-size: 8pt; color: #666; text-align: center; margin-top: 2pt; }
+    .claim { margin: 8pt 0 14pt 0; page-break-inside: avoid; }
+    .claim-id { font-size: 8pt; color: #888; margin-bottom: 2pt; font-family: 'DejaVu Sans Mono', monospace; }
+    .claim-text { font-size: 10pt; }
+    .citations { margin: 4pt 0 0 12pt; padding: 0; list-style: none; }
+    .citation { font-size: 8pt; color: #555; margin: 2pt 0; }
+    .citation-label { font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>{{ report_title }}</h1>
+  <div class="subtitle">
+    Submission {{ webapp_submission_id }} &middot; Generated {{ generated_at }}
+  </div>
+
+  {% block content %}{% endblock %}
+
+  <div class="appendix">
+    <h2>Technical Metadata</h2>
+    <table>
+      <tr><th style="width:30%">Field</th><th>Value</th></tr>
+      <tr><td>Submission ID</td><td class="mono">{{ webapp_submission_id }}</td></tr>
+      <tr><td>User (hashed)</td><td class="mono">{{ user_hash }}</td></tr>
+      <tr><td>Generated</td><td class="mono">{{ generated_at }}</td></tr>
+      <tr><td>Report type</td><td class="mono">{{ report.report_type }}</td></tr>
+      <tr><td>Schema version</td><td class="mono">{{ report.schema_version }}</td></tr>
+      <tr><td>Sanitization manifest</td><td class="mono">{{ report.sanitization_manifest_id or "none" }}</td></tr>
+    </table>
+  </div>
+
+  <div class="appendix">
+    <h2>Provenance</h2>
+    <p class="empty">Every claim cites at least one verbatim source. Non-verbatim citations are removed before rendering.</p>
+    {% if all_citations %}
+    <table>
+      <tr><th>Claim</th><th>Source</th><th>Verbatim</th></tr>
+      {% for c in all_citations %}
+      <tr>
+        <td class="mono">{{ c.claim_id }}</td>
+        <td class="mono">{{ c.source_type }}:{{ c.source_id }}</td>
+        <td><span class="verbatim">{{ c.verbatim }}</span></td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% else %}
+    <p class="empty">No citations to display.</p>
+    {% endif %}
+  </div>
+
+  {% if manifest and manifest.redaction_appendix %}
+  <div class="appendix">
+    <h2>Redaction Summary</h2>
+    <p class="empty">Counts only; redacted values are never printed.</p>
+    <table>
+      <tr><th>Class</th><th>Count</th></tr>
+      <tr><td>Local IPs redacted</td><td>{{ manifest.redaction_appendix.local_ips_redacted }}</td></tr>
+      <tr><td>Passwords / secrets redacted</td><td>{{ manifest.redaction_appendix.passwords_secrets_redacted }}</td></tr>
+      <tr><td>Sandbox paths redacted</td><td>{{ manifest.redaction_appendix.sandbox_paths_redacted }}</td></tr>
+      <tr><td>Sandbox hostnames / users redacted</td><td>{{ manifest.redaction_appendix.sandbox_hostnames_users_redacted }}</td></tr>
+      <tr><td>Remote indicators preserved</td><td>{{ manifest.redaction_appendix.remote_indicators_preserved }}</td></tr>
+    </table>
+  </div>
+  {% endif %}
+
+  {% if screenshots %}
+  <div class="attachments">
+    <h2>Attachments</h2>
+    <p class="empty">Screenshots are captured from the sandbox desktop; analytical content is in the text.</p>
+    {% for s in screenshots %}
+    <div>
+      <img class="screenshot" src="{{ s.data_uri }}" alt="screenshot">
+      <div class="screenshot-caption">{{ s.relative_path }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+</body>
+</html>

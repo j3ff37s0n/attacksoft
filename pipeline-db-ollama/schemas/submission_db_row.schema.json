@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pipeline.local/schemas/submission_db_row.schema.json",
+  "type": "object",
+  "required": [
+    "schema_version", "webapp_submission_id", "pipeline_submission_id",
+    "user_id", "user_id_sha256_12", "idempotency_key", "callback_url",
+    "state", "trace_id", "artifact_root", "analysis_date",
+    "report_manifest_json", "created_at", "updated_at",
+    "retention_delete_after"
+  ],
+  "properties": {
+    "schema_version": { "const": "submission-db-row/1.0" },
+    "webapp_submission_id": { "$ref": "common.schema.json#/$defs/Uuid" },
+    "pipeline_submission_id": { "$ref": "common.schema.json#/$defs/Uuid" },
+    "user_id": { "type": "string", "minLength": 1 },
+    "user_id_sha256_12": { "type": "string", "pattern": "^[a-f0-9]{12}$" },
+    "idempotency_key": { "type": "string", "minLength": 1 },
+    "callback_url": { "type": "string", "format": "uri" },
+    "cuckoo_task_id": { "type": ["string", "null"] },
+    "state": {
+      "enum": [
+        "received", "submitted_to_cuckoo", "sandbox_running", "sandbox_complete",
+        "evidence_extracted", "sanitized", "retrieval_done", "generating_reports",
+        "verifying", "rendering", "complete",
+        "failed_cuckoo_api", "failed_extraction", "failed_sanitization",
+        "failed_retrieval", "failed_generation", "failed_verification",
+        "failed_rendering", "failed_callback", "failed_unknown"
+      ]
+    },
+    "error_code": { "type": ["string", "null"] },
+    "trace_id": { "type": "string", "minLength": 1 },
+    "artifact_root": { "type": "string", "minLength": 1 },
+    "analysis_date": { "type": "string", "pattern": "^[0-9]{8}$" },
+    "report_manifest_json": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "sha256", "generated_at", "relative_path"],
+        "properties": {
+          "type": { "enum": ["executive_risk", "timeline_attack_chain", "remediation"] },
+          "sha256": { "$ref": "common.schema.json#/$defs/Sha256" },
+          "generated_at": { "$ref": "common.schema.json#/$defs/IsoUtc" },
+          "relative_path": { "type": "string", "minLength": 1 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "sanitization_manifest_sha256": {
+      "oneOf": [{ "$ref": "common.schema.json#/$defs/Sha256" }, { "type": "null" }]
+    },
+    "retrieval_result_sha256": {
+      "oneOf": [{ "$ref": "common.schema.json#/$defs/Sha256" }, { "type": "null" }]
+    },
+    "llm_model": { "type": ["string", "null"] },
+    "prompt_versions_json": { "type": "object" },
+    "created_at": { "$ref": "common.schema.json#/$defs/IsoUtc" },
+    "updated_at": { "$ref": "common.schema.json#/$defs/IsoUtc" },
+    "submitted_at": { "type": ["string", "null"] },
+    "sandbox_started_at": { "type": ["string", "null"] },
+    "sandbox_completed_at": { "type": ["string", "null"] },
+    "analysis_completed_at": { "type": ["string", "null"] },
+    "retention_delete_after": { "$ref": "common.schema.json#/$defs/DateOnly" }
+  },
+  "additionalProperties": false
+}

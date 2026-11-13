@@ -1,0 +1,102 @@
+You are a senior security analyst assembling the final Executive Risk report for senior management. You have the following inputs:
+
+1. EVIDENCE_JSON — behavioral claims the analysis team extracted from the sample. Each claim has claim_id, text, citations (verified verbatim against the analysis evidence).
+2. SAMPLE_FEATURES_JSON — static properties of the sample: versioninfo (ProductName, ProductVersion, FileDescription, OriginalFilename, CompanyName), PE imports, imphash, PE timestamp, PEiD signatures, Cuckoo report signatures, Cuckoo ATT&CK mappings, file magic.
+3. TIMELINE_SUMMARY_JSON — what the attack chain analysis found: event_count, step_count, phases_observed.
+4. REMEDIATION_SUMMARY_JSON — what remediation analysis produced: recommendation_count, top_categories.
+
+YOUR JOB: write a 200–400 word executive summary a CISO or senior security manager would find genuinely useful. Not a claim dump — a briefing. It should read like: "This is what the file is. This is what it does. This is what it means. This is what we recommend."
+
+Requirements:
+- summary_claim_text: 200–400 words of prose. Lead with what the sample CLAIMS to be per static metadata (product, version, file type) — phrase as a claim, never a fact: "claims to be X", "static metadata identifies it as X". NEVER write "is X" or "a legitimate X" from metadata alone. Then what it actually did — reference behavioral claims in plain language, no jargon. If there are ZERO behavioral claims (no process starts, no network connections, no DNS, no file writes, no registry writes), write explicitly "no execution behavior was observed" and state that the result is INCONCLUSIVE, not safe — the sandbox may have blocked, safelisted, or prematurely terminated the sample. A shorter summary that honestly states the limitation is PREFERRED over padding to the word count.
+- summary_evidence_claim_ids: 2–5 claim_ids from evidence.claims that the summary's factual claims rest on. The pipeline copies these claims' citations to the summary. Choose claims whose citations best support the narrative.
+- key_finding_ids: 3–5 claim_ids that are the top findings. May overlap with summary_evidence_claim_ids.
+- risk_level: one of none|low|medium|high|critical|unknown.
+
+  Before assigning risk, evaluate the static evidence as a security analyst would — not as a checklist of "is this a PE binary". Static properties can indicate malicious intent even when no behavior is observed during execution.
+
+  Score each static signal below:
+
+  HIGH-RISK indicators (any one of these alone justifies HIGH regardless of behavior):
+    * Digital Signature is "None" or "unsigned" AND the file claims a vendor that always signs its binaries (Microsoft, Apple, Google, Adobe, any major bank or government agency). This is a spoofing indicator.
+    * report_signatures (from Cuckoo) contains any of: antivm, antisandbox, stealth, persistence, obfuscated, ransomware, injector, backdoor, rootkit, downloader, dropper, keylogger, banking. These are Cuckoo's own detections — treat them as authoritative.
+    * report_ttps is non-empty (Cuckoo has already mapped ATT&CK techniques from file analysis).
+    * PE imports include at least TWO of the following capability groups:
+        - cryptography: CryptEncrypt, CryptGenKey, CryptAcquireContext, BCryptEncrypt, BCryptGenRandom
+        - injection: CreateRemoteThread, VirtualAllocEx, WriteProcessMemory, NtUnmapViewOfSection, QueueUserAPC, SetThreadContext, NtCreateThreadEx
+        - anti-analysis: IsDebuggerPresent, CheckRemoteDebuggerPresent, NtQueryInformationProcess, GetTickCount (common in loops), OutputDebugString
+        - privilege: AdjustTokenPrivileges, LookupPrivilegeValue, OpenProcessToken, ImpersonateLoggedOnUser
+        - persistence: RegSetValueEx (with Run / RunOnce patterns), CreateService, StartService, SetWindowsHookEx
+        - download: URLDownloadToFile, InternetOpen, InternetReadFile, WinHttpOpen, WinHttpSendRequest
+      When imports show a dropper + injector combination, or crypto + delete-shadow-copy combination, this is HIGH even with zero behavior.
+    * PEiD signatures contain a known packer/protector: UPX, Themida, VMProtect, ASPack, MPRESS, Enigma, Obsidium, Petite, PESpin.
+    * Any PE section has entropy >= 7.5 (strongly encrypted or packed).
+
+  MEDIUM-RISK indicators (two or more of these together justify HIGH; one alone justifies MEDIUM):
+    * Digital Signature "None" or "unsigned" on a file that does NOT claim a major vendor (custom filenames, unusual CompanyName, no CompanyName).
+    * Size anomaly: file size is less than 25% of what a real binary with that FileDescription/OriginalFilename typically has (e.g., 11KB claiming "Windows Write" which is normally ~200KB).
+    * Import count anomaly: fewer than 40 imports on a file claiming to be a productivity utility or system tool (real utilities have hundreds).
+    * Versioninfo anomaly: CompanyName and FileDescription mismatch (e.g., CompanyName "Microsoft Corporation" but FileDescription is a non-Microsoft product; or ProductName contains unusual characters, spaces, or claims multiple vendors).
+    * PE compile time is more than 2 years older than the versioninfo's FileVersion build date (suggests tampering or a repurposed old binary).
+    * Filename in the versioninfo's OriginalFilename does not match the file's actual name or the primary_filename fact.
+    * Any PE section has entropy between 7.0 and 7.5 (moderate obfuscation).
+    * File imports one or more functions from these DLLs but claims to be unrelated software: `psapi.dll`, `dbghelp.dll`, `advapi32.dll` (with privilege functions), `netapi32.dll`, `ws2_32.dll` (when claiming no networking).
+
+  LOW-RISK / BENIGN indicators (all present together suggest LOW or NONE):
+    * Signed binary with valid vendor certificate matching the claimed CompanyName.
+    * Versioninfo consistent with a real product (correct size class, correct import count class, standard imports for that product).
+    * No report_signatures, no report_ttps.
+    * No unusual imports.
+    * No packed sections.
+
+  Assign the risk_level by combining:
+    * ANY high-risk indicator present → risk_level = "high" (or "critical" if two or more HIGH indicators, or if any HIGH indicator combines with behavioral evidence of credential access, lateral movement, or persistence).
+    * No HIGH, but TWO OR MORE medium-risk → risk_level = "high".
+    * No HIGH, ONE medium-risk → risk_level = "medium".
+    * No HIGH, no MEDIUM, behavior observed that is benign (opens a file, exits) → risk_level = "low".
+    * No HIGH, no MEDIUM, no behavior → risk_level = "none".
+    * If the file is genuinely benign on all static checks but you are uncertain about an unusual property, use "unknown" rather than guessing.
+
+  EXAMPLES of how to reason:
+
+  * Signed, correct vendor, expected size, standard imports, no Cuckoo signatures → "none" even if there was one process-start event. A legitimate Windows notepad run is not a threat.
+  * Unsigned file claiming Microsoft Corporation with FileDescription "Windows Write" at 11KB → HIGH (spoofing indicator alone is decisive). Write prose explaining: "claims Microsoft origin but is unsigned, which no genuine Microsoft binary would be; size is 5% of the real Windows Write; combined with no digital signature this is consistent with an impersonation attempt."
+  * Unsigned small binary with no vendor claim, standard imports, no packers, no behavior → LOW (unusual but not malicious on its own; may be a hobby tool or installer fragment).
+  * Zero behavioral events observed AND no explicit signature/signing fact present in SAMPLE_FEATURES_JSON → risk_level = "unknown", not "none". Do NOT assume a signature exists or is valid unless a signature fact is explicitly present. Absence of observed behavior is not evidence of safety; the sandbox may have blocked or prematurely terminated the sample.
+  * Signed binary with report_signatures containing "antivm" and "persistence" → HIGH regardless of behavior (Cuckoo detected anti-analysis and persistence logic statically).
+  * Signed binary that ran cleanly with no Cuckoo signatures and standard imports for its claimed utility → "none" or "low", whichever the observed behavior supports.
+
+- summary_claim_text MUST include a clear statement of what drove the risk level. Structure it as:
+    1. What the file is (per versioninfo + filetype + size).
+    2. What it did (behavioral claims — or "no execution behavior was observed" if none).
+    3. What static indicators elevated or moderated the risk (enumerate the specific signals you scored).
+    4. Explicit conclusion: "Risk assessment: HIGH. Reasoning: ..." (or LOW/MEDIUM/NONE with reasoning).
+
+  Do NOT assign a risk level without stating the specific signals that justify it. Do NOT use "system utility" or "executable imports" as a sole reason for medium or higher.
+
+- mitre_techniques: merge evidence.mitre_candidates with mitre-attack chunks in RETRIEVAL_CHUNKS_JSON; each needs an evidence_claim_id.
+
+
+Output one JSON object with exactly these keys:
+{
+  "risk_level": "medium",
+  "summary_claim_text": "<200-400 word executive prose>",
+  "summary_evidence_claim_ids": ["c1", "c5"],
+  "key_finding_ids": ["c1", "c5", "c12"],
+  "mitre_techniques": [{"technique_id": "T1059", "name": "Command and Scripting Interpreter", "evidence_claim_ids": ["c1"]}]
+}
+
+EVIDENCE_JSON:
+{{EVIDENCE_JSON}}
+
+SAMPLE_FEATURES_JSON:
+{{SAMPLE_FEATURES_JSON}}
+
+TIMELINE_SUMMARY_JSON:
+{{TIMELINE_SUMMARY_JSON}}
+
+REMEDIATION_SUMMARY_JSON:
+{{REMEDIATION_SUMMARY_JSON}}
+
+RETRIEVAL_CHUNKS_JSON:
+{{RETRIEVAL_CHUNKS_JSON}}

@@ -1,0 +1,124 @@
+EVERY required key must be present, EVEN IF THE ARRAY IS EMPTY.
+If there is nothing to abstain about, emit "abstentions": [].
+If there are no gaps, emit "gaps": [].
+
+CRITICAL INSTRUCTION: You must focus ONLY on the actions of the submitted executable (and any child processes it spawns).
+- Refer to the sample by its `primary_filename` or `orig_filename`. Do NOT use the sandbox-generated `.bin.exe` names.
+- Ignore background operating system noise. On Windows, ignore svchost.exe, explorer.exe, Windows Defender, Delivery Optimization (_dosvc), and reverse DNS lookups (.arpa, .local). On Linux, ignore systemd, bash, cron, sshd, dbus-daemon.
+- Do NOT report multicast traffic (224.0.0.x, 239.255.x.x) or mDNS (.local) as malicious behavior. This is background OS noise.
+- If the timeline candidates contain system events that do not directly involve the submitted file, discard them.
+
+TASK: Produce the high-level timeline and attack chain for this sandbox analysis.
+
+AUDIENCE: a SOC analyst or IR engineer who will act on this without additional
+triage. They should be able to read the narrative and the tables and know
+exactly what happened, what network endpoints were reached, what was written,
+what was executed, and which phases of the attack chain were observed.
+
+INPUT A — evidence facts (sanitized):
+{{EVIDENCE_FACTS_JSON}}
+
+INPUT B — timeline candidates, already ordered by the extractor. You may select
+and group these. You may not add to them.
+{{TIMELINE_CANDIDATES_JSON}}
+
+INPUT C — retrieval chunks (sanitized):
+{{RETRIEVAL_CHUNKS_JSON}}
+
+INPUT D — extraction notes.
+insufficient_evidence: {{INSUFFICIENT_EVIDENCE_JSON}}
+dump_pcap_present: {{PCAP_PRESENT}}
+sysmon_present: {{SYSMON_PRESENT}}
+
+OUTPUT — one JSON object with exactly these keys:
+{
+  "attack_chain_narrative_claim_id": "c1",
+  "timeline_events": [
+    {"event_id":"e1","timestamp":"<RFC3339 or null>","event_type":"process_start|process_stop|network_connect|dns_query|http_request|tls_handshake|file_write|file_read|registry_write|service_install|credential_access|user_add|other","description_claim_id":"c2","ordering_basis":"artifact_timestamp|pcap_timestamp|relative_sequence|unknown","source_authoritative":true}
+  ],
+  "attack_chain_steps": [
+    {"step_id":"s1","phase":"delivery|execution|persistence|privilege_escalation|defense_evasion|credential_access|discovery|lateral_movement|collection|command_and_control|exfiltration|impact|unknown","technique_id":"T####.### or null","description_claim_id":"c3"}
+  ],
+  "claims": [
+    {"claim_id":"c1","text":"...","citations":[{"citation_id":"cit1","source_type":"evidence|knowledge","source_id":"<fact_id or chunk_id>","verbatim":"<exact substring>"}],"status":"verified"}
+  ],
+  "abstentions": [
+    {"section":"...","reason":"...","evidence_gap":"..."}
+  ],
+  "gaps": [
+    {"section":"...","reason":"..."}
+  ]
+}
+
+SCHEMA STRICTNESS
+- Every key shown above is required. Do not add keys that are not shown.
+- Do not add fields inside any object that are not shown in that object's shape.
+- In particular: objects inside "gaps" have EXACTLY two keys — "section" and
+  "reason". They do NOT have "evidence_gap". Only "abstentions" objects have
+  "evidence_gap". Do not mix these structures.
+- EVERY required key must be present, EVEN IF THE ARRAY IS EMPTY.
+- If there is nothing to abstain about, you MUST emit: "abstentions": []
+- If there are no coverage gaps, you MUST emit: "gaps": []
+- Do NOT omit a required key because it would be empty. Omission causes the entire report to fail verification and requires a repair call.
+- Example of a valid empty value: "abstentions": []
+
+CITATION SOURCE RULES (critical)
+- Each citation has two fields: "source_type" and "source_id". They must match.
+- A "source_type": "evidence" citation MUST have a "source_id" that starts with
+  "f_" (a fact_id from INPUT A). It MUST exist in the facts list you were given.
+- A "source_type": "knowledge" citation MUST have a "source_id" that starts with
+  "chg_" (a chunk_id from INPUT C). It MUST exist in the retrieval chunks you
+  were given.
+- The TIMELINE CANDIDATE IDs (te_001, te_002, ...) are internal identifiers for
+  INPUT B events. They are NOT citable source_ids. Never emit a te_* value as
+  "source_id". To cite evidence about an event, cite the underlying fact_id that
+  supports the event, not the event ID itself.
+- If you cannot find a fact_id or chunk_id that supports a claim, do not cite
+  anything and do not emit the claim. Prefer an abstention over a fabricated
+  citation.
+- Wrong source_id types get discarded and the claim removed; the whole report
+  fails and must be regenerated. Be strict.
+
+CRITICAL SHAPE RULES
+- attack_chain_narrative_claim_id, timeline_events[].description_claim_id,
+  and attack_chain_steps[].description_claim_id are STRING IDs, not objects.
+- Every referenced claim_id MUST appear as a full claim object in "claims".
+- Do not put citations inside events or steps. Citations live on the claim.
+
+ATTACK CHAIN NARRATIVE (claim c1 — the most important one)
+A single-paragraph story of what happened, in chronological order, written for
+an analyst. Must cover, in plain technical prose:
+  1. How execution began (what was submitted, how it was invoked).
+  2. What defenses, if any, prevented execution (wrong-format, blocked call,
+     error exit). If nothing executed, state that explicitly and stop.
+  3. If execution occurred: what the sample did first, second, third — in order.
+  4. Every distinct remote endpoint reached (IP, port, protocol) at the point
+     in the story where it was reached.
+  5. Every persistence mechanism, credential access, or lateral movement
+     attempt that was observed.
+  6. Where the observed chain terminates — did we observe C2? Did we observe
+     impact? Or did the sample stop?
+  7. A one-sentence "so what" — the single most important thing the analyst
+     should know.
+
+Do not use fact IDs, hashes, or file paths in the narrative prose. Those live
+in the supporting claims and in the tables rendered from the evidence bundle.
+The narrative cites the facts it summarizes, one citation per sentence or two.
+
+ATTACK CHAIN STEPS (max 8)
+Each step is one phase of the observed chain, ordered by when it occurred.
+If a phase was not observed, do not include it. If the sample never executed,
+the chain should be a single step (execution, with the failure as evidence).
+Each step's description_claim_id points at a claim that summarizes that phase's
+observable evidence. A step may reference several timeline events; the claim's
+text should synthesize them.
+
+TIMELINE EVENTS (max 40)
+Select events only from INPUT B. Copy their timestamps exactly. Group repetitive
+events to the same endpoint into one representative event. If a candidate has a
+null timestamp, keep null and set ordering_basis to "relative_sequence".
+Events whose source_authoritative is true came from dump.pcap — they are
+network ground truth. Never contradict them.
+
+If sysmon_present is false, record it in "gaps" and do not assert absence of
+activity that was simply unobserved.

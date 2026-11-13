@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Attack Chain Narrative</h2>
+  {% if narrative_claim %}
+  <div class="summary-box">
+    <p>{{ narrative_claim.text }}</p>
+  </div>
+  {% else %}
+  <p class="empty">No narrative was produced.</p>
+  {% endif %}
+
+  <h2>Observed Phases</h2>
+  {% if steps %}
+  <table>
+    <tr><th>Step</th><th>Phase</th><th>Technique</th><th>Summary Claim</th></tr>
+    {% for s in steps %}
+    <tr>
+      <td class="mono">{{ s.step_id }}</td>
+      <td>{{ s.phase|replace("_", " ")|title }}</td>
+      <td class="mono">{{ s.technique_id or "—" }}</td>
+      <td class="mono">{{ s.description_claim_id }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p class="empty">No attack-chain steps were identified from the evidence.</p>
+  {% endif %}
+
+  <h2>Remote Network Activity</h2>
+  <p class="empty">Every distinct destination observed in the pcap (authoritative) or Sysmon network events (informational).</p>
+  {% if network_summary.rows %}
+  <table>
+    <tr><th>Destination</th><th>Port</th><th>Protocol</th><th>Flow</th><th>Authoritative (pcap)</th><th>Observations</th></tr>
+    {% for r in network_summary.rows %}
+    <tr>
+      <td class="mono">{{ r.dst }}</td>
+      <td class="mono">{{ r.port }}</td>
+      <td class="mono">{{ r.proto }}</td>
+      <td class="mono verbatim">{{ r.direction }}</td>
+      <td>{{ "yes" if r.authoritative else "no" }}</td>
+      <td>{{ r.observed_count }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% if network_summary.total > network_summary.rows|length %}
+  <p class="empty">Showing {{ network_summary.rows|length }} of {{ network_summary.total }} distinct destinations.</p>
+  {% endif %}
+  {% else %}
+  <p class="empty">No network activity was captured in the evidence bundle.</p>
+  {% endif %}
+
+  <h2>DNS Activity</h2>
+  {% if dns_summary.rows %}
+  <table>
+    <tr><th>Query / Response</th><th>Source</th><th>Authoritative</th><th>Count</th></tr>
+    {% for r in dns_summary.rows %}
+    <tr>
+      <td class="mono verbatim">{{ r.value }}</td>
+      <td class="mono">{{ r.kind }}</td>
+      <td>{{ "yes" if r.authoritative else "no" }}</td>
+      <td>{{ r.count }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p class="empty">No DNS activity was captured in the evidence bundle.</p>
+  {% endif %}
+
+  <h2>File Operations</h2>
+  {% if file_summary.rows %}
+  <table>
+    <tr><th>Path</th><th>Action</th><th>Count</th></tr>
+    {% for r in file_summary.rows %}
+    <tr>
+      <td class="mono verbatim">{{ r.path }}</td>
+      <td>{{ r.action }}</td>
+      <td>{{ r.count }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% if file_summary.total > file_summary.rows|length %}
+  <p class="empty">Showing {{ file_summary.rows|length }} of {{ file_summary.total }} file operations.</p>
+  {% endif %}
+  {% else %}
+  <p class="empty">No file operations were captured in the evidence bundle.</p>
+  {% endif %}
+
+  <h2>Process Activity</h2>
+  {% if process_summary.rows %}
+  <table>
+    <tr><th>Image</th><th>Command Line</th><th>Parent Image</th><th>User</th></tr>
+    {% for r in process_summary.rows %}
+    <tr>
+      <td class="mono verbatim">{{ r.image }}</td>
+      <td class="mono verbatim">{{ r.command_line }}</td>
+      <td class="mono verbatim">{{ r.parent_image }}</td>
+      <td class="mono">{{ r.user }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% if process_summary.total > process_summary.rows|length %}
+  <p class="empty">Showing {{ process_summary.rows|length }} of {{ process_summary.total }} process events.</p>
+  {% endif %}
+  {% else %}
+  <p class="empty">No process activity was captured in the evidence bundle.</p>
+  {% endif %}
+  {% if screenshots %}
+  <h2>Screenshots</h2>
+  <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; page-break-inside: avoid;">
+    {% for shot in screenshots %}
+      <div style="border: 1px solid #ccc; padding: 5px; text-align: center; background: #fff; break-inside: avoid;">
+        <img src="{{ shot.data_uri }}" style="max-width: 250px; max-height: 250px; object-fit: contain;" />
+        <div style="font-size: 0.75em; color: #555; margin-top: 5px;">
+          {{ shot.relative_path.split('/')[-1] }}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+
+  <h2>Timeline</h2>
+  {% if events %}
+  <table>
+    <tr><th>Event</th><th>Timestamp (UTC)</th><th>Type</th><th>Claim</th><th>Authoritative</th></tr>
+    {% for e in events %}
+    <tr>
+      <td class="mono">{{ e.event_id }}</td>
+      <td class="mono">{{ e.timestamp or "unknown" }}</td>
+      <td>{{ e.event_type }}</td>
+      <td class="mono">{{ e.description_claim_id }}</td>
+      <td>{{ "yes" if e.source_authoritative else "no" }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p class="empty">No timeline events were identified.</p>
+  {% endif %}
+
+  <h2>Event Claims</h2>
+  {% if event_claims %}
+    {% for claim in event_claims %}
+    <div class="claim">
+      <div class="claim-id">{{ claim.claim_id }}</div>
+      <div class="claim-text">{{ claim.text }}</div>
+      <ul class="citations">
+        {% for cit in claim.citations %}
+        <li class="citation"><span class="citation-label">{{ cit.source_type }}:</span> {{ cit.source_id }} &mdash; <span class="verbatim">{{ cit.verbatim }}</span></li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endfor %}
+  {% else %}
+  <p class="empty">No event claims to display.</p>
+  {% endif %}
+
+  {% if gaps %}
+  <h2>Coverage Gaps</h2>
+  {% for g in gaps %}
+  <div class="limitation">
+    <div class="limitation-title">{{ g.section|replace("_", " ")|title }}</div>
+    <p>{{ g.reason }}</p>
+  </div>
+  {% endfor %}
+  {% endif %}
+
+  {% if abstentions %}
+  <h2>Abstentions</h2>
+  {% for a in abstentions %}
+  <div class="limitation">
+    <div class="limitation-title">{{ a.section|replace("_", " ")|title }}</div>
+    <p><strong>Reason:</strong> {{ a.reason }}</p>
+    <p><strong>Evidence gap:</strong> {{ a.evidence_gap }}</p>
+  </div>
+  {% endfor %}
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,25 @@
+{
+  "EVIDENCE_FACTS_JSON": [
+    {"fact_id":"f_reg_001","category":"registry","key":"run_key_target","value":"C:\\Users\\Public\\svc.exe","verbatim":"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\Updater","authoritative":false},
+    {"fact_id":"f_proc_003","category":"process","key":"cmdline","value":"powershell -ExecutionPolicy Bypass -w hidden -c IEX(...)","verbatim":"powershell.exe -ExecutionPolicy Bypass -w hidden -c IEX","authoritative":false},
+    {"fact_id":"f_net_010","category":"network","key":"tcp_connect","value":"203.0.113.42:443","verbatim":"203.0.113.42:443 tcp","authoritative":true}
+  ],
+  "TIMELINE_CANDIDATES_JSON": [
+    {"event_id":"te_1","timestamp":"2026-10-27T11:55:20Z","event_type":"process_start","source_artifact":"events/Windows/process","source_authoritative":false,"verbatim":"powershell.exe started"},
+    {"event_id":"te_2","timestamp":"2026-10-27T11:55:31Z","event_type":"registry_write","source_artifact":"events/Windows/registry","source_authoritative":false,"verbatim":"Run key written"},
+    {"event_id":"te_3","timestamp":"2026-10-27T11:55:44Z","event_type":"network_connect","source_artifact":"task_1/dump.pcap","source_authoritative":true,"verbatim":"203.0.113.42:443 tcp"}
+  ],
+  "RETRIEVAL_CHUNKS_JSON": [
+    {"chunk_id":"chg_attack_T1547","source_id":"attack:T1547","title":"T1547 Boot or Logon Autostart Execution","text":"Adversaries may configure system settings to automatically execute a program during system boot or logon.","metadata":{"source_type":"attack","technique_id":"T1547"}},
+    {"chunk_id":"chg_playbook_persistence","source_id":"playbook:persistence.runkey","title":"Playbook: Run-key persistence response","text":"Enumerate HKCU and HKLM Software\\Microsoft\\Windows\\CurrentVersion\\Run entries, hash each target binary, and remove entries whose hash matches the analyzed sample.","metadata":{"source_type":"playbook","playbook_id":"playbook:persistence.runkey"}}
+  ],
+  "ATTACK_CHAIN_PHASES_JSON": ["execution", "command_and_control"],
+  "INSUFFICIENT_EVIDENCE_JSON": [],
+  "RETRIEVAL_CONFIDENCE_JSON": {"threshold":0.35,"max_score":0.81,"mean_top_k_score":0.62,"sufficient":true,"reason":"two playbook-matching chunks above threshold"},
+  "PCAP_PRESENT": true,
+  "SYSMON_PRESENT": false,
+  "VALIDATION_ERRORS_JSON": [
+    {"path":["recommendations",0,"rationale_claim_id"],"message":"expected string, got object"}
+  ],
+  "PRIOR_OUTPUT": "{\"recommendations\":[{\"recommendation_id\":\"r1\",\"rationale_claim_id\":{\"claim_id\":\"c1\"}}],\"claims\":[],\"abstentions\":[]}"
+}

@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pipeline.local/schemas/sanitization_manifest.schema.json",
+  "type": "object",
+  "required": ["schema_version", "submission_id", "generated_at", "sanitizer_version", "config_sha256", "pre_llm", "post_llm", "redaction_appendix"],
+  "properties": {
+    "schema_version": { "const": "sanitization-manifest/1.0" },
+    "submission_id": { "$ref": "common.schema.json#/$defs/Uuid" },
+    "generated_at": { "$ref": "common.schema.json#/$defs/IsoUtc" },
+    "sanitizer_version": { "type": "string" },
+    "config_sha256": { "$ref": "common.schema.json#/$defs/Sha256" },
+    "pre_llm": { "$ref": "#/$defs/SanitizationPass" },
+    "post_llm": { "$ref": "#/$defs/SanitizationPass" },
+    "redaction_appendix": {
+      "type": "object",
+      "required": ["local_ips_redacted", "passwords_secrets_redacted", "sandbox_paths_redacted", "sandbox_hostnames_users_redacted", "remote_indicators_preserved"],
+      "properties": {
+        "local_ips_redacted": { "type": "integer", "minimum": 0 },
+        "passwords_secrets_redacted": { "type": "integer", "minimum": 0 },
+        "sandbox_paths_redacted": { "type": "integer", "minimum": 0 },
+        "sandbox_hostnames_users_redacted": { "type": "integer", "minimum": 0 },
+        "remote_indicators_preserved": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "SanitizationPass": {
+      "type": "object",
+      "required": ["counts", "rule_hits", "warning"],
+      "properties": {
+        "counts": {
+          "type": "object",
+          "required": ["local_ips", "secrets", "sandbox_paths", "sandbox_hostnames", "sandbox_macs", "remote_indicators_preserved"],
+          "properties": {
+            "local_ips": { "type": "integer", "minimum": 0 },
+            "secrets": { "type": "integer", "minimum": 0 },
+            "sandbox_paths": { "type": "integer", "minimum": 0 },
+            "sandbox_hostnames": { "type": "integer", "minimum": 0 },
+            "sandbox_macs": { "type": "integer", "minimum": 0 },
+            "remote_indicators_preserved": { "type": "integer", "minimum": 0 }
+          },
+          "additionalProperties": false
+        },
+        "rule_hits": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["rule_id", "count"],
+            "properties": {
+              "rule_id": { "type": "string" },
+              "count": { "type": "integer", "minimum": 0 }
+            },
+            "additionalProperties": false
+          }
+        },
+        "warning": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

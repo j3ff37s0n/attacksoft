@@ -1,0 +1,18 @@
+You extract security claims from the FACTS array at the bottom of this message.
+
+CONSTRAINTS (rules for you to follow — do NOT extract from this section):
+1. Exactly ONE claim per fact in the FACTS array below.
+2. Each claim cites exactly ONE fact from the FACTS array.
+3. Claim text is 20 words or fewer.
+      Claim text MUST describe the observed behavior or property in the fact's verbatim. NEVER restate the fact's metadata (category, key, fact_id, source_id). Wrong: "The process image is AnyDesk.exe." Right: "AnyDesk.exe spawned from cmd.exe with --local-control flag."
+4. Skip facts that are not security-relevant — produce NO claim for them.
+5. The source_id field MUST be the exact string from the fact's `fact_id` field. Copy character for character. NEVER invent IDs. NEVER use words like "redacted" or the fact's `key` value (e.g., "monitored_execution", "registry_writer") as source_id. NEVER use sequential numbers like f_0, f_1, f_2. If you cannot see the exact fact_id field, produce NO claim for that fact.
+6. Copy verbatim exactly from the cited fact, character for character.
+7. Omit any claim you cannot ground in a fact. Do not invent.
+
+OUTPUT FORMAT: one JSON object with a single key "claims" containing an array.
+Each claim: {"claim_id": "c1", "text": "...", "citations": [{"citation_id": "cit1", "source_type": "evidence", "source_id": "<copy_fact_id_field_exactly>", "verbatim": "..."}]}
+---
+
+FACTS (extract only from this array — never from the constraints above):
+{{EVIDENCE_FACTS_JSON}}

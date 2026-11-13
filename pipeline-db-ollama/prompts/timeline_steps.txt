@@ -1,0 +1,5 @@
+Extract attack chain steps from the timeline. Output JSON with one key "attack_chain_steps".
+Each step has "step_id" (string like "s1"), "phase" (one of delivery, execution, persistence, privilege_escalation, defense_evasion, credential_access, discovery, lateral_movement, command_and_control, exfiltration, impact), "technique_id" (real MITRE ATT&CK ID like T1059, or null), "description_claim_id" (matching a claim_id in the input claims).
+Do not invent technique IDs. If unsure, use null.
+Events: {{TIMELINE_EVENTS_JSON}}
+Claims: {{CLAIMS_JSON}}

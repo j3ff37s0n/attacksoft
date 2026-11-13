@@ -1,0 +1,30 @@
+# /opt/pipeline/config/sanitizer.yaml
+# Loaded at startup. Hash is recorded in every sanitization manifest.
+# Any change to this file changes the manifest config_sha256.
+
+internal_cidrs:
+  - 192.168.0.0/16
+  - 10.0.0.0/8
+  - 172.16.0.0/12
+  - 127.0.0.0/8
+  - ::1/128
+  - fe80::/10
+
+# Populated only if you know the sandbox hostnames. Empty by default.
+sandbox_hostnames: []
+
+# Filesystem paths used by the sandbox itself. Longest-first, prefix match
+# with a boundary check (so /home/sandbox does not match /home/sandbox_test).
+sandbox_paths:
+  - "C:\\cuckoo"
+  - "/home/sandbox"
+  - "/opt/cuckoo3"
+  - "/var/lib/cuckoo"
+  - "/tmp/cuckoo_"
+
+# Populated only if you know the sandbox MAC addresses. Empty by default.
+sandbox_macs: []
+
+# Regex used to detect key-value secret patterns. The key stays visible,
+# the value is replaced with <redacted>.
+secret_key_regex: "(?i)(?:password|passwd|pwd|secret|token|api[_-]?key|access[_-]?key|private[_-]?key|credential)"

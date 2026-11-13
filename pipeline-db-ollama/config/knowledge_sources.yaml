@@ -1,0 +1,77 @@
+mitre:
+  index_url: "https://raw.githubusercontent.com/mitre-attack/attack-stix-data/master/index.json"
+  fallback_bundle_url: "https://raw.githubusercontent.com/mitre-attack/attack-stix-data/master/enterprise-attack/enterprise-attack.json"
+
+nvd:
+  feed_url_template: "https://nvd.nist.gov/feeds/json/cve/2.0/nvdcve-2.0-{year}.json.gz"
+  modified_url: "https://nvd.nist.gov/feeds/json/cve/2.0/nvdcve-2.0-modified.json.gz"
+  full_years: [2021, 2022, 2023, 2024, 2025, 2026]
+  retention_years: 5
+
+kev:
+  url: "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json"
+
+baseline:
+  path: "/opt/pipeline/knowledge/baseline/playbooks.yaml"
+
+
+# --- EPSS: Exploit Prediction Scoring System (FIRST.org) ---
+# Daily CSV with per-CVE exploitation probability. Used to enrich
+# existing NVD rows (metadata update only, no re-embedding).
+epss:
+  url: "https://epss.empiricalsecurity.com/epss_scores-current.csv.gz"
+  # Scores older than this many days are dropped during retention sweep
+  retention_days: 90
+
+# --- RSS: free security news and advisory feeds ---
+# Each feed becomes a set of citable knowledge chunks with source_type
+# matching the feed's declared source_type. Capped at 50 newest entries
+# per feed per run.
+rss:
+  max_entries_per_feed: 50
+  feeds:
+    - name: "CISA Advisories"
+      url: "https://www.cisa.gov/cybersecurity-advisories/all.xml"
+      source_type: "cisa-advisory"
+    - name: "The Hacker News"
+      url: "https://feeds.feedburner.com/TheHackersNews"
+      source_type: "security-news"
+    - name: "BleepingComputer"
+      url: "https://www.bleepingcomputer.com/feed/"
+      source_type: "security-news"
+    - name: "Krebs on Security"
+      url: "https://krebsonsecurity.com/feed/"
+      source_type: "security-news"
+    - name: "Microsoft Security Blog"
+      url: "https://www.microsoft.com/security/blog/feed/"
+      source_type: "vendor-advisory"
+    - name: "Cisco Talos"
+      url: "https://blog.talosintelligence.com/rss/"
+      source_type: "vendor-advisory"
+    - name: "Google Online Security"
+      url: "https://security.googleblog.com/feeds/posts/default?alt=rss"
+      source_type: "vendor-advisory"
+    - name: "Google Project Zero"
+      url: "https://googleprojectzero.blogspot.com/feeds/posts/default?alt=rss"
+      source_type: "vendor-advisory"
+    - name: "Chrome Releases (Stable)"
+      url: "https://chromereleases.googleblog.com/feeds/posts/default/-/Stable%20updates"
+      source_type: "vendor-advisory"
+    - name: "Apple Security Research"
+      url: "https://security.apple.com/blog/feed.rss"
+      source_type: "vendor-advisory"
+    - name: "Microsoft MSRC"
+      url: "https://msrc-blog.microsoft.com/feed"
+      source_type: "vendor-advisory"
+    - name: "Dark Reading"
+      url: "https://www.darkreading.com/rss.xml"
+      source_type: "security-news"
+    - name: "SecurityWeek"
+      url: "https://feeds.feedburner.com/securityweek"
+      source_type: "security-news"
+    - name: "The Record"
+      url: "https://therecord.media/feed/"
+      source_type: "security-news"
+    - name: "CyberScoop"
+      url: "https://www.cyberscoop.com/feed"
+      source_type: "security-news"

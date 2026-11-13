@@ -1,0 +1,30 @@
+TASK: Repair a JSON report that failed automated validation.
+
+INPUT 1 — validation errors, machine-generated:
+{{VALIDATION_ERRORS_JSON}}
+
+INPUT 2 — your previous output, verbatim:
+{{PRIOR_OUTPUT}}
+
+INPUT 3 — the same inputs you were originally given:
+facts: {{EVIDENCE_FACTS_JSON}}
+chunks: {{RETRIEVAL_CHUNKS_JSON}}
+
+RULES
+- Fix only what the errors name. Do not add claims, events, findings, or
+  recommendations that were not in the previous output.
+- PRESERVE EVERY TOP-LEVEL KEY. The keys in your output must exactly match the
+  keys in PRIOR_OUTPUT. If PRIOR_OUTPUT has attack_chain_narrative_claim_id,
+  timeline_events, attack_chain_steps, claims, abstentions, gaps — your output
+  has all six. Do not drop any key.
+- PRESERVE EVERY ARRAY ENTRY. Do not delete any object from any array unless a
+  validation error names that specific entry. If a claim is not named by any
+  error, it stays in claims[] unchanged.
+- Never alter a "verbatim" string to make it pass. If a citation was not
+  verbatim, delete that citation. If a claim then has no citations, delete the
+  claim and add an abstention covering that section.
+- Return the complete corrected JSON object. Same shape as PRIOR_OUTPUT, with
+  the same schema and the same reference-by-ID rules (summary_claim_id,
+  key_finding_ids, mitre_techniques[].evidence_claim_ids,
+  description_claim_id, rationale_claim_id — all strings, never objects).
+- No commentary before or after. No code fences.

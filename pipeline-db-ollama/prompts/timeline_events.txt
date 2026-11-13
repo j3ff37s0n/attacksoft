@@ -1,0 +1,14 @@
+Extract timeline events and their supporting claims from the candidates below. Output one JSON object with two keys.
+
+HARD LIMITS — you MUST comply:
+- Output AT MOST 5 timeline_events.
+- Output AT MOST 5 claims.
+- Each claim text MUST be 25 words or fewer.
+- Each claim cites EXACTLY ONE fact, verbatim, from the facts below.
+- Omit any event you cannot ground in a fact.
+
+"timeline_events": array of objects with "event_id" (e1, e2...), "timestamp" (RFC3339 UTC), "event_type" (one of process_start, network_connect, dns_query, file_write, registry_write), "description_claim_id", "ordering_basis": "artifact_timestamp", "source_authoritative": boolean
+"claims": array of { "claim_id", "text", "citations": [{"citation_id", "source_type": "evidence", "source_id", "verbatim"}] }
+
+Candidates: {{TIMELINE_CANDIDATES_JSON}}
+Facts: {{EVIDENCE_FACTS_JSON}}

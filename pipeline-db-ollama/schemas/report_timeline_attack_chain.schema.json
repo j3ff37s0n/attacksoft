@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pipeline.local/schemas/report_timeline_attack_chain.schema.json",
+  "type": "object",
+  "required": [
+    "schema_version", "submission_id", "report_type", "generated_at",
+    "model", "prompt_version", "sanitization_manifest_id",
+    "attack_chain_narrative_claim_id",
+    "timeline_events", "attack_chain_steps", "claims", "abstentions", "gaps"
+  ],
+  "properties": {
+    "schema_version": { "const": "report-output/1.0" },
+    "submission_id": { "$ref": "common.schema.json#/$defs/Uuid" },
+    "report_type": { "const": "timeline_attack_chain" },
+    "generated_at": { "$ref": "common.schema.json#/$defs/IsoUtc" },
+    "model": { "type": "string" },
+    "prompt_version": { "type": "string" },
+    "sanitization_manifest_id": { "type": "string" },
+    "attack_chain_narrative_claim_id": { "type": "string", "minLength": 1 },
+    "timeline_events": {
+      "type": "array",
+      "maxItems": 40,
+      "items": {
+        "type": "object",
+        "required": ["event_id", "timestamp", "event_type", "description_claim_id", "ordering_basis", "source_authoritative"],
+        "properties": {
+          "event_id": { "type": "string", "minLength": 1 },
+          "timestamp": { "type": ["string", "null"] },
+          "event_type": {
+            "enum": [
+              "process_start", "process_stop", "network_connect", "dns_query",
+              "http_request", "tls_handshake", "file_write", "file_read",
+              "registry_write", "service_install", "credential_access",
+              "user_add", "other"
+            ]
+          },
+          "description_claim_id": { "type": "string", "minLength": 1 },
+          "ordering_basis": { "enum": ["artifact_timestamp", "pcap_timestamp", "relative_sequence", "unknown"] },
+          "source_authoritative": { "type": "boolean" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "attack_chain_steps": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "required": ["step_id", "phase", "description_claim_id"],
+        "properties": {
+          "step_id": { "type": "string", "minLength": 1 },
+          "phase": {
+            "enum": [
+              "delivery", "execution", "persistence", "privilege_escalation",
+              "defense_evasion", "credential_access", "discovery",
+              "lateral_movement", "collection", "command_and_control",
+              "exfiltration", "impact", "unknown"
+            ]
+          },
+          "technique_id": { "type": ["string", "null"], "pattern": "^T[0-9]{4}(\\.[0-9]{3})?$" },
+          "description_claim_id": { "type": "string", "minLength": 1 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "claims": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 50,
+      "items": { "$ref": "common.schema.json#/$defs/Claim" }
+    },
+    "abstentions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["section", "reason", "evidence_gap"],
+        "properties": {
+          "section": { "type": "string" },
+          "reason": { "type": "string" },
+          "evidence_gap": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "gaps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["section", "reason"],
+        "properties": {
+          "section": { "type": "string" },
+          "reason": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "timeline_event_ids": { "type": "array", "items": { "type": "string" } },
+    "attack_chain_step_ids": { "type": "array", "items": { "type": "string" } },
+    "generation_meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "chunks_total":  { "type": "integer", "minimum": 0 },
+        "chunks_failed": { "type": "integer", "minimum": 0 },
+        "degraded":      { "type": "boolean" }
+      },
+      "required": ["chunks_total", "chunks_failed", "degraded"]
+    }
+  },
+  "additionalProperties": false
+}
