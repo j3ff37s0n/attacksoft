@@ -1,3 +1,4 @@
+#how remediations are matched by the llm, used by it's knowledge. current llm sizes not as effective in using this, I'd suggest 3b for small model and 4b for larger one in this config.
 entries:
   - id: "playbook:email.delivery"
     source_type: "baseline-playbook"
