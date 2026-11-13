@@ -1,6 +1,7 @@
 # /opt/pipeline/config/sanitizer.yaml
 # Loaded at startup. Hash is recorded in every sanitization manifest.
 # Any change to this file changes the manifest config_sha256.
+#sanitizer uses this to know what to replace
 
 internal_cidrs:
   - 192.168.0.0/16
